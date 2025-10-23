@@ -1,0 +1,38 @@
+import { Injectable } from '@nestjs/common';
+import { PrismaService } from '../../../core/database/prisma.service';
+import { PassageiroRepositoryContract } from '../contracts/passageiro-repository.contract';
+import { PassageiroEntity } from '../entities/passageiro.entity';
+
+@Injectable()
+export class PassageiroRepository implements PassageiroRepositoryContract {
+  constructor(private readonly prisma: PrismaService) {}
+
+  async create(data: {
+    nome: string;
+    email: string;
+    cpf: string;
+    telefone?: string;
+  }): Promise<PassageiroEntity> {
+    const passageiro = await this.prisma.passageiro.create({
+      data,
+    });
+
+    return PassageiroEntity.create(passageiro);
+  }
+
+  async findByEmail(email: string): Promise<PassageiroEntity | null> {
+    const passageiro = await this.prisma.passageiro.findUnique({
+      where: { email },
+    });
+
+    return passageiro ? PassageiroEntity.create(passageiro) : null;
+  }
+
+  async findByCpf(cpf: string): Promise<PassageiroEntity | null> {
+    const passageiro = await this.prisma.passageiro.findUnique({
+      where: { cpf },
+    });
+
+    return passageiro ? PassageiroEntity.create(passageiro) : null;
+  }
+}
