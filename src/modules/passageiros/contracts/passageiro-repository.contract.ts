@@ -12,4 +12,10 @@ export interface PassageiroRepositoryContract {
   findByCpf(cpf: string): Promise<PassageiroEntity | null>;
   findById(id: number): Promise<PassageiroEntity | null>;
   findAll(): Promise<PassageiroEntity[]>;
+  update(id: number, data: {
+    nome?: string;
+    email?: string;
+    cpf?: string;
+    telefone?: string;
+  }): Promise<PassageiroEntity>;
 }

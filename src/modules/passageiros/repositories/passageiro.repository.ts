@@ -52,4 +52,18 @@ export class PassageiroRepository implements PassageiroRepositoryContract {
     return passageiros.map(passageiro => PassageiroEntity.create(passageiro));
   }
 
+  async update(id: number, data: {
+    nome?: string;
+    email?: string;
+    cpf?: string;
+    telefone?: string;
+  }): Promise<PassageiroEntity> {
+    const passageiro = await this.prisma.passageiro.update({
+      where: { id },
+      data,
+    });
+
+    return PassageiroEntity.create(passageiro);
+  }
+
 }

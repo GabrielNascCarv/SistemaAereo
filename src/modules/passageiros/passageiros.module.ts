@@ -7,6 +7,8 @@ import { ListarPassageirosUseCase } from './use-cases/listar-passageiros.use-cas
 import { ListarPassageirosUseCaseFactory } from './use-cases/listar-passageiros.use-case.factory';
 import { ListarPassageiroPorIdUseCase } from './use-cases/listar-passageiro-por-id.use-case';
 import { ListarPassageiroPorIdUseCaseFactory } from './use-cases/listar-passageiro-por-id.use-case.factory';
+import { AtualizarPassageiroUseCase } from './use-cases/atualizar-passageiro.use-case';
+import { AtualizarPassageiroUseCaseFactory } from './use-cases/atualizar-passageiro.use-case.factory';
 import { PassageiroControllerFactory } from './controllers/passageiro.controller.factory';
 
 @Module({
@@ -19,6 +21,8 @@ import { PassageiroControllerFactory } from './controllers/passageiro.controller
     ListarPassageirosUseCaseFactory,
     ListarPassageiroPorIdUseCase,
     ListarPassageiroPorIdUseCaseFactory,
+    AtualizarPassageiroUseCase,
+    AtualizarPassageiroUseCaseFactory,
     PassageiroControllerFactory,
   ],
   exports: [PassageiroRepository],

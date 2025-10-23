@@ -1,8 +1,10 @@
-import { Controller, Post, Body, HttpCode, HttpStatus, Get, Param, ParseIntPipe, NotFoundException } from '@nestjs/common';
+import { Controller, Post, Body, HttpCode, HttpStatus, Get, Param, ParseIntPipe, NotFoundException, Put } from '@nestjs/common';
 import { CriarPassageiroUseCase } from '../use-cases/criar-passageiro.use-case';
 import { ListarPassageirosUseCase } from '../use-cases/listar-passageiros.use-case';
 import { ListarPassageiroPorIdUseCase } from '../use-cases/listar-passageiro-por-id.use-case';
+import { AtualizarPassageiroUseCase } from '../use-cases/atualizar-passageiro.use-case';
 import { CriarPassageiroDto } from '../dto/criar-passageiro.dto';
+import { AtualizarPassageiroDto } from '../dto/atualizar-passageiro.dto';
 import { PassageiroResponseDto } from '../dto/passageiro-response.dto';
 
 @Controller('passageiros')
@@ -11,6 +13,7 @@ export class PassageiroController {
     private readonly criarPassageiroUseCase: CriarPassageiroUseCase,
     private readonly listarPassageirosUseCase: ListarPassageirosUseCase,
     private readonly listarPassageiroPorIdUseCase: ListarPassageiroPorIdUseCase,
+    private readonly atualizarPassageiroUseCase: AtualizarPassageiroUseCase,
   ) {}
 
   @Post()
@@ -49,6 +52,23 @@ export class PassageiroController {
     if (!passageiro) {
       throw new NotFoundException('Passageiro não encontrado');
     }
+    
+    return new PassageiroResponseDto({
+      id: passageiro.id,
+      nome: passageiro.nome,
+      email: passageiro.email,
+      cpf: passageiro.cpf,
+      telefone: passageiro.telefone,
+      createdAt: passageiro.createdAt,
+    });
+  }
+
+  @Put(':id')
+  async atualizar(
+    @Param('id', ParseIntPipe) id: number,
+    @Body() data: AtualizarPassageiroDto,
+  ): Promise<PassageiroResponseDto> {
+    const passageiro = await this.atualizarPassageiroUseCase.execute(id, data);
     
     return new PassageiroResponseDto({
       id: passageiro.id,
