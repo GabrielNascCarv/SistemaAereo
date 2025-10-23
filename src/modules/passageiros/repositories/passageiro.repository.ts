@@ -36,6 +36,14 @@ export class PassageiroRepository implements PassageiroRepositoryContract {
     return passageiro ? PassageiroEntity.create(passageiro) : null;
   }
 
+  async findById(id: number): Promise<PassageiroEntity | null> {
+    const passageiro = await this.prisma.passageiro.findUnique({
+      where: { id },
+    });
+
+    return passageiro ? PassageiroEntity.create(passageiro) : null;
+  }
+
   async findAll(): Promise<PassageiroEntity[]> {
     const passageiros = await this.prisma.passageiro.findMany({
       orderBy: { createdAt: 'desc' },
