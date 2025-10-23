@@ -1,9 +1,9 @@
 import { Injectable } from '@nestjs/common';
 import { PassageiroController } from './passageiro.controller';
-import { CriarPassageiroUseCaseFactory } from '../use-cases/criar-passageiro.use-case.factory';
-import { ListarPassageirosUseCaseFactory } from '../use-cases/listar-passageiros.use-case.factory';
-import { ListarPassageiroPorIdUseCaseFactory } from '../use-cases/listar-passageiro-por-id.use-case.factory';
-import { AtualizarPassageiroUseCaseFactory } from '../use-cases/atualizar-passageiro.use-case.factory';
+import { CriarPassageiroUseCaseFactory } from '../use-cases/factory/criar-passageiro.use-case.factory';
+import { ListarPassageirosUseCaseFactory } from '../use-cases/factory/listar-passageiros.use-case.factory';
+import { ListarPassageiroPorIdUseCaseFactory } from '../use-cases/factory/listar-passageiro-por-id.use-case.factory';
+import { AtualizarPassageiroUseCaseFactory } from '../use-cases/factory/atualizar-passageiro.use-case.factory';
 
 @Injectable()
 export class PassageiroControllerFactory {
