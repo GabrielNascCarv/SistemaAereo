@@ -1,6 +1,6 @@
 import { Injectable } from '@nestjs/common';
-import { ListarPassageirosUseCase } from './listar-passageiros.use-case';
-import { PassageiroRepository } from '../repositories/passageiro.repository';
+import { ListarPassageirosUseCase } from '../listar-passageiros.use-case';
+import { PassageiroRepository } from '../../repositories/passageiro.repository';
 
 @Injectable()
 export class ListarPassageirosUseCaseFactory {

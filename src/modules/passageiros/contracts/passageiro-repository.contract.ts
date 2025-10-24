@@ -18,4 +18,5 @@ export interface PassageiroRepositoryContract {
     cpf?: string;
     telefone?: string;
   }): Promise<PassageiroEntity>;
+  delete(id: number): Promise<boolean>;
 }

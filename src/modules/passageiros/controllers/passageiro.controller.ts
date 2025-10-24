@@ -1,4 +1,4 @@
-import { Controller, Post, Body, HttpCode, HttpStatus, Get, Param, ParseIntPipe, NotFoundException, Put } from '@nestjs/common';
+import { Controller, Post, Body, HttpCode, HttpStatus, Get, Param, ParseIntPipe, NotFoundException, Put, Delete } from '@nestjs/common';
 import { CriarPassageiroUseCase } from '../use-cases/criar-passageiro.use-case';
 import { ListarPassageirosUseCase } from '../use-cases/listar-passageiros.use-case';
 import { ListarPassageiroPorIdUseCase } from '../use-cases/listar-passageiro-por-id.use-case';
@@ -6,6 +6,7 @@ import { AtualizarPassageiroUseCase } from '../use-cases/atualizar-passageiro.us
 import { CriarPassageiroDto } from '../dto/criar-passageiro.dto';
 import { AtualizarPassageiroDto } from '../dto/atualizar-passageiro.dto';
 import { PassageiroResponseDto } from '../dto/passageiro-response.dto';
+import { DeletarPassageiroUseCase } from '../use-cases/deletar-passageiro.use-case';
 
 @Controller('passageiros')
 export class PassageiroController {
@@ -14,6 +15,7 @@ export class PassageiroController {
     private readonly listarPassageirosUseCase: ListarPassageirosUseCase,
     private readonly listarPassageiroPorIdUseCase: ListarPassageiroPorIdUseCase,
     private readonly atualizarPassageiroUseCase: AtualizarPassageiroUseCase,
+    private readonly deletarPassageiroUseCase: DeletarPassageiroUseCase,
   ) {}
 
   @Post()
@@ -78,5 +80,15 @@ export class PassageiroController {
       telefone: passageiro.telefone,
       createdAt: passageiro.createdAt,
     });
+  }
+
+  @Delete(':id')
+  async deletar(@Param('id', ParseIntPipe) id: number): Promise<{ success: boolean; message: string }> {
+    const success = await this.deletarPassageiroUseCase.execute(id);
+    
+    return {
+      success,
+      message: success ? 'Passageiro deletado com sucesso' : 'Erro ao deletar passageiro'
+    };
   }
 }

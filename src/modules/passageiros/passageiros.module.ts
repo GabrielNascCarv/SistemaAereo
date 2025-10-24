@@ -10,6 +10,8 @@ import { ListarPassageiroPorIdUseCaseFactory } from './use-cases/factory/listar-
 import { AtualizarPassageiroUseCase } from './use-cases/atualizar-passageiro.use-case';
 import { AtualizarPassageiroUseCaseFactory } from './use-cases/factory/atualizar-passageiro.use-case.factory';
 import { PassageiroControllerFactory } from './controllers/passageiro.controller.factory';
+import { DeletarPassageiroUseCase } from './use-cases/deletar-passageiro.use-case';
+import { DeletarPassageiroUseCaseFactory } from './use-cases/factory/deletar-passageiro.use-case.factory';
 
 @Module({
   controllers: [PassageiroController],
@@ -23,6 +25,8 @@ import { PassageiroControllerFactory } from './controllers/passageiro.controller
     ListarPassageiroPorIdUseCaseFactory,
     AtualizarPassageiroUseCase,
     AtualizarPassageiroUseCaseFactory,
+    DeletarPassageiroUseCase,
+    DeletarPassageiroUseCaseFactory,
     PassageiroControllerFactory,
   ],
   exports: [PassageiroRepository],

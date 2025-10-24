@@ -66,4 +66,15 @@ export class PassageiroRepository implements PassageiroRepositoryContract {
     return PassageiroEntity.create(passageiro);
   }
 
+  async delete(id: number): Promise<boolean> {
+    try {
+      await this.prisma.passageiro.delete({
+        where: { id },
+      });
+      return true;
+    } catch (error) {
+      return false;
+    }
+  }
+
 }
