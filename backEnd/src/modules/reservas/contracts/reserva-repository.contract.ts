@@ -3,4 +3,5 @@ import { CriarReservaDto } from "../dto/criar-reserva.dto";
 
 export interface ReservaRepositoryContract {
     create(data: CriarReservaDto): Promise<ReservaEntity>;
+    findAll(): Promise<ReservaEntity[]>;
 }
