@@ -4,6 +4,7 @@ import { APP_PIPE } from '@nestjs/core';
 import { DatabaseModule } from './core/database/database.module';
 import { PassageirosModule } from './modules/passageiros/passageiros.module';
 import { ReservasModule } from './modules/reservas/reservas.module';
+import { VoosModule } from './modules/voos/voos.module';
 
 @Module({
   imports: [
@@ -14,6 +15,7 @@ import { ReservasModule } from './modules/reservas/reservas.module';
     DatabaseModule,
     PassageirosModule,
     ReservasModule,
+    VoosModule,
   ],
   controllers: [],
   providers: [
