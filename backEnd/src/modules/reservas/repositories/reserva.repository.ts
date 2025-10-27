@@ -9,7 +9,6 @@ export class ReservaRepository implements ReservaRepositoryContract {
     constructor(private prisma: PrismaService) {}
 
     async create(data: CriarReservaDto): Promise<ReservaEntity> {
-        // Gera código de reserva se não foi fornecido
         const codigoReserva = data.codigoReserva || `RES${Date.now()}`;
         
         const reserva = await this.prisma.reserva.create({
@@ -23,5 +22,13 @@ export class ReservaRepository implements ReservaRepositoryContract {
             },
         });
         return ReservaEntity.create(reserva);
+    }
+
+    async findAll(): Promise<ReservaEntity[]> {
+        const reservas = await this.prisma.reserva.findMany({
+            orderBy: { createdAt: 'desc' },
+        });
+        
+        return reservas.map(reserva => ReservaEntity.create(reserva));
     }
 }
