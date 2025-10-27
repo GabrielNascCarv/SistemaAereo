@@ -1,11 +1,6 @@
-// src/modules/reservas/contracts/reserva-repository.contract.ts
 import { ReservaEntity } from "../entities/reserva.entity";
+import { CriarReservaDto } from "../dto/criar-reserva.dto";
 
 export interface ReservaRepositoryContract {
-    create(data: {
-        codigoReserva: string;
-        numeroPassageiros: number;
-        vooId: number;
-        passageiroId: number;
-    }): Promise<ReservaEntity>;
+    create(data: CriarReservaDto): Promise<ReservaEntity>;
 }

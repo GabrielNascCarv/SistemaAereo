@@ -8,15 +8,16 @@ import { Injectable } from "@nestjs/common";
 export class ReservaRepository implements ReservaRepositoryContract {
     constructor(private prisma: PrismaService) {}
 
-    async create(data: {
-        codigoReserva: string;
-        numeroPassageiros: number;
-        vooId: number;
-        passageiroId: number;
-    }): Promise<ReservaEntity> {
+    async create(data: CriarReservaDto): Promise<ReservaEntity> {
+        // Gera código de reserva se não foi fornecido
+        const codigoReserva = data.codigoReserva || `RES${Date.now()}`;
+        
         const reserva = await this.prisma.reserva.create({
             data: {
-                ...data,
+                codigoReserva,
+                numeroPassageiros: data.numeroPassageiros,
+                vooId: data.vooId,
+                passageiroId: data.passageiroId,
                 dataReserva: new Date(),
                 status: 'CONFIRMADA'
             },
