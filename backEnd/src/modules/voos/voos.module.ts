@@ -4,6 +4,8 @@ import { VooControllerFactory } from './controllers/voo.controller.factory';
 import { VooRepository } from './repositories/voo.repository';
 import { CriarVooUseCase } from './use-cases/criar-voo.use-case';
 import { CriarVooUseCaseFactory } from './use-cases/factory/criar-voo.use-case.factory';
+import { ListarVooUseCase } from './use-cases/listar-voos-use-case';
+import { ListarVooUseCaseFactory } from './use-cases/factory/listar-voo.use-case.factory';
 
 @Module({
   controllers: [VooController],
@@ -11,7 +13,9 @@ import { CriarVooUseCaseFactory } from './use-cases/factory/criar-voo.use-case.f
     VooRepository,
     CriarVooUseCase,
     CriarVooUseCaseFactory,
-    VooControllerFactory,
+    VooControllerFactory, 
+    ListarVooUseCase,
+    ListarVooUseCaseFactory,
   ],
   exports: [VooRepository],
 })
