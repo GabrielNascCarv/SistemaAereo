@@ -1,5 +1,6 @@
-import { Controller, Post, Body, HttpCode, HttpStatus } from '@nestjs/common';
+import { Controller, Post, Body, HttpCode, HttpStatus, Get } from '@nestjs/common';
 import { CriarVooUseCase } from '../use-cases/criar-voo.use-case';
+import { ListarVooUseCase } from '../use-cases/listar-voos-use-case';
 import { CriarVooDto } from '../dto/criar-voo.dto';
 import { VooResponseDto } from '../dto/voo-response.dto';
 
@@ -7,6 +8,7 @@ import { VooResponseDto } from '../dto/voo-response.dto';
 export class VooController {
   constructor(
     private readonly criarVooUseCase: CriarVooUseCase,
+    private readonly listarVooUseCase: ListarVooUseCase,
   ) {}
 
   @Post()
@@ -26,5 +28,11 @@ export class VooController {
       status: voo.status,
       createdAt: voo.createdAt,
     });
+  }
+
+  @Get()
+  async listar(): Promise<VooResponseDto[]> {
+    const voos = await this.listarVooUseCase.execute();
+    return voos.map(voo => new VooResponseDto(voo));
   }
 }
