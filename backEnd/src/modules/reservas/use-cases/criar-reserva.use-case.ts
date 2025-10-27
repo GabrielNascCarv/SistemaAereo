@@ -4,7 +4,7 @@ import { CriarReservaUseCaseContract } from "../contracts/criar-reserva-use-case
 import { ReservaEntity } from "../entities/reserva.entity";
 import { ReservaRepository } from "../repositories/reserva.repository";
 import { CriarReservaDto } from "../dto/criar-reserva.dto";
-import { PrismaService } from "src/core/database/prisma.service";
+import { PrismaService } from "../../../core/database/prisma.service";
 
 @Injectable()
 export class CriarReservaUseCase implements CriarReservaUseCaseContract {
