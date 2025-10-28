@@ -1,14 +1,13 @@
 import { Injectable } from "@nestjs/common";
 import { PrismaService } from "../../../core/database/prisma.service";
 import { ReservaEntity } from "../entities/reserva.entity";
-import { CriarReservaDto } from "../dto/criar-reserva.dto";
-import { ReservaRepositoryContract } from "../contracts/reserva-repository.contract";
+import { ReservaRepositoryContract, CriarReservaParams, AtualizarReservaParams } from "../contracts/reserva-repository.contract";
 
 @Injectable()
 export class ReservaRepository implements ReservaRepositoryContract {
     constructor(private prisma: PrismaService) {}
 
-    async create(data: CriarReservaDto): Promise<ReservaEntity> {
+    async create(data: CriarReservaParams): Promise<ReservaEntity> {
         const codigoReserva = data.codigoReserva || `RES${Date.now()}`;
         
         const reserva = await this.prisma.reserva.create({
@@ -37,6 +36,21 @@ export class ReservaRepository implements ReservaRepositoryContract {
             where: { id },
         });
 
+        return reserva ? ReservaEntity.create(reserva) : null;
+    }
+
+    async update(id: number, data: AtualizarReservaParams): Promise<ReservaEntity> {
+        const reserva = await this.prisma.reserva.update({
+            where: { id },
+            data,
+        });
+        return ReservaEntity.create(reserva);
+    }
+
+    async findByCodigoReserva(codigoReserva: string): Promise<ReservaEntity | null> {
+        const reserva = await this.prisma.reserva.findUnique({
+            where: { codigoReserva },
+        });
         return reserva ? ReservaEntity.create(reserva) : null;
     }
 }
