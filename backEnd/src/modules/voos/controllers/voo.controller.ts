@@ -1,10 +1,11 @@
-import { Controller, Post, Body, HttpCode, HttpStatus, Get, Put, Param, ParseIntPipe } from '@nestjs/common';
+import { Controller, Post, Body, HttpCode, HttpStatus, Get, Put, Param, ParseIntPipe, Delete } from '@nestjs/common';
 import { CriarVooUseCase } from '../use-cases/criar-voo.use-case';
 import { ListarVooUseCase } from '../use-cases/listar-voos-use-case';
 import { AtualizarVooUseCase } from '../use-cases/atualizar-voo.use-case';
 import { CriarVooDto } from '../dto/criar-voo.dto';
 import { AtualizarVooDto } from '../dto/atualizar-voo.dto';
 import { VooResponseDto } from '../dto/voo-response.dto';
+import { DeletarVooUseCase } from '../use-cases/deletar-voo.use-case';
 
 @Controller('voos')
 export class VooController {
@@ -12,6 +13,7 @@ export class VooController {
     private readonly criarVooUseCase: CriarVooUseCase,
     private readonly listarVooUseCase: ListarVooUseCase,
     private readonly atualizarVooUseCase: AtualizarVooUseCase,
+    private readonly deletarVooUseCase: DeletarVooUseCase,
   ) {}
 
   @Post()
@@ -71,4 +73,10 @@ export class VooController {
       createdAt: voo.createdAt,
     });
   }
+
+  @Delete(':id')
+  async deletar(@Param('id', ParseIntPipe) id: number): Promise<void> {
+    await this.deletarVooUseCase.execute(id);
+  }
+
 }
