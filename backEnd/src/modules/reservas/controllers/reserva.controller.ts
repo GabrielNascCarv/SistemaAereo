@@ -34,11 +34,7 @@ export class ReservaController {
     @Get(':id')
     async listarPorId(@Param('id', ParseIntPipe) id: number): Promise<ReservaResponseDto> {
         const reserva = await this.listarReservaPorIdUseCase.execute(id);
-
-        if (!reserva) {
-            throw new NotFoundException('Reserva não encontrada');
-        }
-
+        
         return new ReservaResponseDto({
             id: reserva.id,
             codigoReserva: reserva.codigoReserva,
