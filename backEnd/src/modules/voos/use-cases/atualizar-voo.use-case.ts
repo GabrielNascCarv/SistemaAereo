@@ -16,13 +16,12 @@ export class AtualizarVooUseCase implements AtualizarVooUseCaseContract {
     preco?: number;
     status?: string;
   }) {
-    // Verificar se o voo existe
+    
     const vooExistente = await this.vooRepository.findById(id);
     if (!vooExistente) {
       throw new NotFoundException('Voo não encontrado');
     }
 
-    // Atualizar o voo
     const voo = await this.vooRepository.update(id, data);
     return voo;
   }
