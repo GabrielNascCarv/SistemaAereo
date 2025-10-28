@@ -8,6 +8,8 @@ import { ListarVooUseCase } from './use-cases/listar-voos-use-case';
 import { ListarVooUseCaseFactory } from './use-cases/factory/listar-voo.use-case.factory';
 import { AtualizarVooUseCase } from './use-cases/atualizar-voo.use-case';
 import { AtualizarVooUseCaseFactory } from './use-cases/factory/atualizar-voo.use-case.factory';
+import { DeletarVooUseCase } from './use-cases/deletar-voo.use-case';
+import { DeletarVooUseCaseFactory } from './use-cases/factory/deletar-voo.use-case.factory';
 
 @Module({
   controllers: [VooController],
@@ -20,6 +22,8 @@ import { AtualizarVooUseCaseFactory } from './use-cases/factory/atualizar-voo.us
     AtualizarVooUseCase,
     AtualizarVooUseCaseFactory,
     VooControllerFactory,
+    DeletarVooUseCase,
+    DeletarVooUseCaseFactory,
   ],
   exports: [VooRepository],
 })
