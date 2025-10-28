@@ -1,4 +1,4 @@
-import { Injectable } from '@nestjs/common';
+import { Injectable, NotFoundException } from '@nestjs/common';
 import type { ListarReservaPorIdUseCaseContract } from '../contracts/listar-reserva-por-id-use-case.contract';
 import { ReservaRepository } from '../repositories/reserva.repository';
 
@@ -9,6 +9,12 @@ export class ListarReservaPorIdUseCase implements ListarReservaPorIdUseCaseContr
   ) {}
 
   async execute(id: number) {
-    return await this.reservaRepository.findById(id);
+    const reserva = await this.reservaRepository.findById(id);
+    
+    if (!reserva) {
+      throw new NotFoundException('Reserva não encontrada');
+    }
+    
+    return reserva;
   }
 }
