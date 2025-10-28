@@ -5,6 +5,7 @@ import { ReservaRepository } from "../repositories/reserva.repository";
 import { CriarReservaDto } from "../dto/criar-reserva.dto";
 import { VooRepository } from "../../voos/repositories/voo.repository";
 import { PassageiroRepository } from "../../passageiros/repositories/passageiro.repository";
+import { CriarReservaParams } from '../contracts/reserva-repository.contract';
 
 @Injectable()
 export class CriarReservaUseCase implements CriarReservaUseCaseContract {
@@ -37,6 +38,13 @@ export class CriarReservaUseCase implements CriarReservaUseCaseContract {
       throw new NotFoundException(`Passageiro com ID ${data.passageiroId} não encontrado`);
     }
 
-    return await this.reservaRepository.create(data);
+    const createData: CriarReservaParams = {
+        codigoReserva: data.codigoReserva,
+        numeroPassageiros: data.numeroPassageiros,
+        vooId: data.vooId,
+        passageiroId: data.passageiroId,
+    };
+
+    return await this.reservaRepository.create(createData);
   }
 }
