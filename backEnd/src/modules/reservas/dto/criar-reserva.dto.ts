@@ -1,4 +1,3 @@
-// src/modules/reservas/dto/criar-reserva.dto.ts
 import { IsInt, IsNotEmpty, IsPositive, IsString, IsOptional } from "class-validator";
 
 export class CriarReservaDto {

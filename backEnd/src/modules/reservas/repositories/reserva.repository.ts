@@ -31,4 +31,12 @@ export class ReservaRepository implements ReservaRepositoryContract {
         
         return reservas.map(reserva => ReservaEntity.create(reserva));
     }
+
+    async findById(id: number): Promise<ReservaEntity | null> {
+        const reserva = await this.prisma.reserva.findUnique({
+            where: { id },
+        });
+
+        return reserva ? ReservaEntity.create(reserva) : null;
+    }
 }
