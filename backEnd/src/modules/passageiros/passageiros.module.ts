@@ -10,10 +10,10 @@ import { AtualizarPassageiroUseCase } from './use-cases/atualizar-passageiro.use
 import { AtualizarPassageiroUseCaseFactory } from './use-cases/factory/atualizar-passageiro.use-case.factory';
 import { DeletarPassageiroUseCase } from './use-cases/deletar-passageiro.use-case';
 import { DeletarPassageiroUseCaseFactory } from './use-cases/factory/deletar-passageiro.use-case.factory';
-import { PassageiroRoutesController } from './controllers/passageiro-routes.controller';
+import { PassageiroController } from './controllers/passageiro.controller';
 
 @Module({
-  controllers: [PassageiroRoutesController],
+  controllers: [PassageiroController],
   providers: [
     PassageiroRepository,
     CriarPassageiroUseCase,
