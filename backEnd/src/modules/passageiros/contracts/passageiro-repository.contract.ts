@@ -1,19 +1,16 @@
 import { PassageiroEntity } from '../entities/passageiro.entity';
-
 export type TCreatePassageiroRepository = {
     nome: string;
     email: string;
     cpf: string;
     telefone?: string;
 }
-
 export type TUpdatePassageiroRepository = {
   nome: string;
   email: string;
   cpf: string;
   telefone?: string;
 }
-
 export interface IPassageiroRepository {
   create(data:TCreatePassageiroRepository): Promise<PassageiroEntity>;
   findByEmail(email: string): Promise<PassageiroEntity | null>;
