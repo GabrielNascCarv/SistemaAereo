@@ -1,5 +1,5 @@
 import { ReservaEntity } from "../entities/reserva.entity";
 
-export interface ListarReservasUseCaseContract {
+export interface IListarReservasUseCase {
     execute(): Promise<ReservaEntity[]>;
 }

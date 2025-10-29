@@ -1,28 +1,39 @@
 import { Controller, Post, Body, HttpCode, HttpStatus, Get, Param, ParseIntPipe, NotFoundException, Put } from '@nestjs/common';
-import { CriarReservaUseCase } from '../use-cases/criar-reserva.use-case';
-import { ListarReservasUseCase } from '../use-cases/listar-reservas.use-case';
-import { ListarReservaPorIdUseCase } from '../use-cases/listar-reserva-por-id.use-case';
-import { AtualizarReservaUseCase } from '../use-cases/atualizar-reserva.use-case';
+import { CriarReservaUseCaseFactory } from '../use-cases/factory/criar-reserva.use-case.factory';
+import { ListarReservasUseCaseFactory } from '../use-cases/factory/listar-reservas.use-case.factory';
+import { ListarReservaPorIdUseCaseFactory } from '../use-cases/factory/listar-reserva-por-id.use-case.factory';
+import { AtualizarReservaUseCaseFactory } from '../use-cases/factory/atualizar-reserva.use-case.factory';
+
 import { ReservaResponseDto } from '../dto/reserva-response.dto';
 import { CriarReservaDto } from '../dto/criar-reserva.dto';
 import { AtualizarReservaDto } from '../dto/atualizar-reserva.dto';
-import { AtualizarReservaParams } from '../contracts/reserva-repository.contract';
+
 
 @Controller('reservas')
 export class ReservaController {
+        private readonly criarReservaUseCase;
+        private readonly listarReservasUseCase; 
+        private readonly listarReservaPorIdUseCase;
+        private readonly atualizarReservaUseCase;
+
     constructor(
-        private readonly criarReservaUseCase: CriarReservaUseCase,
-        private readonly listarReservasUseCase: ListarReservasUseCase,
-        private readonly listarReservaPorIdUseCase: ListarReservaPorIdUseCase,
-        private readonly atualizarReservaUseCase: AtualizarReservaUseCase, // ✅ Adicionar
-    ) {}
+        private readonly criarReservaUseCaseFactory: CriarReservaUseCaseFactory,
+        private readonly listarReservasUseCaseFactory: ListarReservasUseCaseFactory,
+        private readonly listarReservaPorIdUseCaseFactory: ListarReservaPorIdUseCaseFactory,
+        private readonly atualizarReservaUseCaseFactory: AtualizarReservaUseCaseFactory,
+    ) {
+        this.criarReservaUseCase = this.criarReservaUseCaseFactory.create();
+        this.listarReservasUseCase = this.listarReservasUseCaseFactory.create();
+        this.listarReservaPorIdUseCase = this.listarReservaPorIdUseCaseFactory.create();
+        this.atualizarReservaUseCase = this.atualizarReservaUseCaseFactory.create();
+    }
 
     @Post()
     @HttpCode(HttpStatus.CREATED)
     async criar(@Body() data: CriarReservaDto): Promise<ReservaResponseDto> {
         const reserva = await this.criarReservaUseCase.execute(data);
         
-        return new ReservaResponseDto({
+        const criarReserva = new ReservaResponseDto({
             id: reserva.id,
             codigoReserva: reserva.codigoReserva,
             dataReserva: reserva.dataReserva,
@@ -33,13 +44,18 @@ export class ReservaController {
             createdAt: reserva.createdAt,
             updatedAt: reserva.updatedAt,
         });
+        return criarReserva;
     }
 
     @Get(':id')
     async listarPorId(@Param('id', ParseIntPipe) id: number): Promise<ReservaResponseDto> {
         const reserva = await this.listarReservaPorIdUseCase.execute(id);
         
-        return new ReservaResponseDto({
+        if (!reserva) {
+            throw new NotFoundException('Reserva não encontrada');
+        }
+        
+        const listarReservaPorId = new ReservaResponseDto({
             id: reserva.id,
             codigoReserva: reserva.codigoReserva,
             dataReserva: reserva.dataReserva,
@@ -50,13 +66,14 @@ export class ReservaController {
             createdAt: reserva.createdAt,
             updatedAt: reserva.updatedAt,
         });
+        return listarReservaPorId;
     }
 
     @Get()
     async listar(): Promise<ReservaResponseDto[]> {
         const reservas = await this.listarReservasUseCase.execute();
         
-        return reservas.map(reserva => new ReservaResponseDto({
+        const listarReservas = reservas.map(reserva => new ReservaResponseDto({
             id: reserva.id,
             codigoReserva: reserva.codigoReserva,
             dataReserva: reserva.dataReserva,
@@ -67,25 +84,17 @@ export class ReservaController {
             createdAt: reserva.createdAt,
             updatedAt: reserva.updatedAt,
         }));
+        return listarReservas;
     }
 
     @Put(':id')
     async atualizar(
         @Param('id', ParseIntPipe) id: number,
-        @Body() dto: AtualizarReservaDto,
+        @Body() data: AtualizarReservaDto,
     ): Promise<ReservaResponseDto> {
-        // ✅ Controller converte DTO para Params
-        const updateData: AtualizarReservaParams = {
-            codigoReserva: dto.codigoReserva,
-            status: dto.status,
-            numeroPassageiros: dto.numeroPassageiros,
-            vooId: dto.vooId,
-            passageiroId: dto.passageiroId,
-        };
+        const reserva = await this.atualizarReservaUseCase.execute(id, data);
 
-        const reserva = await this.atualizarReservaUseCase.execute(id, updateData);
-        
-        return new ReservaResponseDto({
+        const atualizarReserva = new ReservaResponseDto({
             id: reserva.id,
             codigoReserva: reserva.codigoReserva,
             dataReserva: reserva.dataReserva,
@@ -96,5 +105,6 @@ export class ReservaController {
             createdAt: reserva.createdAt,
             updatedAt: reserva.updatedAt,
         });
+        return atualizarReserva
     }
 }

@@ -1,13 +1,13 @@
 import { ReservaEntity } from "../entities/reserva.entity";
 
-export interface CriarReservaParams {
+export type TCriarReservaParams = {
     codigoReserva?: string;
     numeroPassageiros: number;
     vooId: number;
     passageiroId: number;
 }
 
-export interface AtualizarReservaParams {
+export type TAtualizarReservaParams = {
     codigoReserva?: string;
     status?: string;
     numeroPassageiros?: number;
@@ -15,10 +15,10 @@ export interface AtualizarReservaParams {
     passageiroId?: number;
 }
 
-export interface ReservaRepositoryContract {
-    create(data: CriarReservaParams): Promise<ReservaEntity>;
+export interface IReservaRepository {
+    create(data: TCriarReservaParams): Promise<ReservaEntity>;
     findAll(): Promise<ReservaEntity[]>;
     findById(id: number): Promise<ReservaEntity | null>;
-    update(id: number, data: AtualizarReservaParams): Promise<ReservaEntity>;
+    update(id: number, data: TAtualizarReservaParams): Promise<ReservaEntity>;
     findByCodigoReserva(codigoReserva: string): Promise<ReservaEntity | null>;
 }

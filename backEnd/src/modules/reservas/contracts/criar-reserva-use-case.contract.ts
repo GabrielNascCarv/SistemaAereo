@@ -1,6 +1,12 @@
 import { ReservaEntity } from "../entities/reserva.entity";
-import { CriarReservaDto } from "../dto/criar-reserva.dto";
 
-export interface CriarReservaUseCaseContract {
-    execute(data: CriarReservaDto): Promise<ReservaEntity>;
+export type TCriarReservaParams = {
+    codigoReserva?: string;
+    numeroPassageiros: number;
+    vooId: number;
+    passageiroId: number;
+}
+
+export interface ICriarReservaUseCase {
+    execute(data: TCriarReservaParams): Promise<ReservaEntity>;
 }
