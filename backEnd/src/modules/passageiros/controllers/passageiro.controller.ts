@@ -1,22 +1,35 @@
 import { Controller, Post, Body, HttpCode, HttpStatus, Get, Param, ParseIntPipe, NotFoundException, Put, Delete } from '@nestjs/common';
-import { CriarPassageiroUseCase } from '../use-cases/criar-passageiro.use-case';
-import { ListarPassageirosUseCase } from '../use-cases/listar-passageiros.use-case';
-import { ListarPassageiroPorIdUseCase } from '../use-cases/listar-passageiro-por-id.use-case';
-import { AtualizarPassageiroUseCase } from '../use-cases/atualizar-passageiro.use-case';
+import { CriarPassageiroUseCaseFactory } from '../use-cases/factory/criar-passageiro.use-case.factory';
+import { ListarPassageirosUseCaseFactory } from '../use-cases/factory/listar-passageiros.use-case.factory';
+import { ListarPassageiroPorIdUseCaseFactory } from '../use-cases/factory/listar-passageiro-por-id.use-case.factory';
+import { AtualizarPassageiroUseCaseFactory } from '../use-cases/factory/atualizar-passageiro.use-case.factory';
+import { DeletarPassageiroUseCaseFactory } from '../use-cases/factory/deletar-passageiro.use-case.factory';
+
 import { CriarPassageiroDto } from '../dto/criar-passageiro.dto';
 import { AtualizarPassageiroDto } from '../dto/atualizar-passageiro.dto';
 import { PassageiroResponseDto } from '../dto/passageiro-response.dto';
-import { DeletarPassageiroUseCase } from '../use-cases/deletar-passageiro.use-case';
 
 @Controller('passageiros')
 export class PassageiroController {
+  private readonly criarPassageiroUseCase;
+  private readonly listarPassageirosUseCase;
+  private readonly listarPassageiroPorIdUseCase;
+  private readonly atualizarPassageiroUseCase;
+  private readonly deletarPassageiroUseCase;
+
   constructor(
-    private readonly criarPassageiroUseCase: CriarPassageiroUseCase,
-    private readonly listarPassageirosUseCase: ListarPassageirosUseCase,
-    private readonly listarPassageiroPorIdUseCase: ListarPassageiroPorIdUseCase,
-    private readonly atualizarPassageiroUseCase: AtualizarPassageiroUseCase,
-    private readonly deletarPassageiroUseCase: DeletarPassageiroUseCase,
-  ) {}
+    private readonly criarPassageiroUseCaseFactory: CriarPassageiroUseCaseFactory,
+    private readonly listarPassageirosUseCaseFactory: ListarPassageirosUseCaseFactory,
+    private readonly listarPassageiroPorIdUseCaseFactory: ListarPassageiroPorIdUseCaseFactory,
+    private readonly atualizarPassageiroUseCaseFactory: AtualizarPassageiroUseCaseFactory,
+    private readonly deletarPassageiroUseCaseFactory: DeletarPassageiroUseCaseFactory,
+  ) {
+    this.criarPassageiroUseCase = this.criarPassageiroUseCaseFactory.create();
+    this.listarPassageirosUseCase = this.listarPassageirosUseCaseFactory.create();
+    this.listarPassageiroPorIdUseCase = this.listarPassageiroPorIdUseCaseFactory.create();
+    this.atualizarPassageiroUseCase = this.atualizarPassageiroUseCaseFactory.create();
+    this.deletarPassageiroUseCase = this.deletarPassageiroUseCaseFactory.create();
+  }
 
   @Post()
   @HttpCode(HttpStatus.CREATED)
