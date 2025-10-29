@@ -1,20 +1,16 @@
 import { Injectable, ConflictException } from '@nestjs/common';
-import type { CriarPassageiroUseCaseContract } from '../contracts/criar-passageiro-use-case.contract';
+import type { ICriarPassageiroUseCase, TCreatePassageiroUseCase } from '../contracts/criar-passageiro-use-case.contract';
+import { PassageiroEntity } from '../entities/passageiro.entity';
 import { PassageiroRepository } from '../repositories/passageiro.repository';
 
 @Injectable()
-export class CriarPassageiroUseCase implements CriarPassageiroUseCaseContract {
+export class CriarPassageiroUseCase implements ICriarPassageiroUseCase {
   constructor(
     private readonly passageiroRepository: PassageiroRepository,
   ) {}
 
-  async execute(data: {
-    nome: string;
-    email: string;
-    cpf: string;
-    telefone?: string;
-  }) {
-    // Verificar se email já existe
+  async execute(data: TCreatePassageiroUseCase): Promise<PassageiroEntity> {
+   
     const passageiroExistenteEmail = await this.passageiroRepository.findByEmail(
       data.email,
     );
@@ -22,7 +18,6 @@ export class CriarPassageiroUseCase implements CriarPassageiroUseCaseContract {
       throw new ConflictException('Email já cadastrado');
     }
 
-    // Verificar se CPF já existe
     const passageiroExistenteCpf = await this.passageiroRepository.findByCpf(
       data.cpf,
     );
@@ -30,7 +25,6 @@ export class CriarPassageiroUseCase implements CriarPassageiroUseCaseContract {
       throw new ConflictException('CPF já cadastrado');
     }
 
-    // Criar passageiro
     const passageiro = await this.passageiroRepository.create(data);
 
     return passageiro;

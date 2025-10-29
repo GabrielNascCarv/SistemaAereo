@@ -6,6 +6,7 @@ import { ListarPassageiroPorIdUseCaseFactory } from '../use-cases/factory/listar
 import { AtualizarPassageiroUseCaseFactory } from '../use-cases/factory/atualizar-passageiro.use-case.factory';
 import { DeletarPassageiroUseCaseFactory } from '../use-cases/factory/deletar-passageiro.use-case.factory';
 
+
 @Injectable()
 export class PassageiroControllerFactory {
     constructor(
@@ -22,6 +23,15 @@ export class PassageiroControllerFactory {
         const listarPassageiroPorIdUseCase = this.listarPassageiroPorIdUseCaseFactory.create();
         const atualizarPassageiroUseCase = this.atualizarPassageiroUseCaseFactory.create();
         const deletarPassageiroUseCase = this.deletarPassageiroUseCaseFactory.create();
-        return new PassageiroController(criarPassageiroUseCase, listarPassageirosUseCase, listarPassageiroPorIdUseCase, atualizarPassageiroUseCase, deletarPassageiroUseCase);
+
+        const controller = new PassageiroController(
+            criarPassageiroUseCase, 
+            listarPassageirosUseCase, 
+            listarPassageiroPorIdUseCase, 
+            atualizarPassageiroUseCase, 
+            deletarPassageiroUseCase
+        );
+
+        return controller
     }
 }

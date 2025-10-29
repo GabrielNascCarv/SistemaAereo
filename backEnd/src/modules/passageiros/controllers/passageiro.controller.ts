@@ -1,29 +1,27 @@
-import { Controller, Post, Body, HttpCode, HttpStatus, Get, Param, ParseIntPipe, NotFoundException, Put, Delete } from '@nestjs/common';
-import { CriarPassageiroUseCase } from '../use-cases/criar-passageiro.use-case';
-import { ListarPassageirosUseCase } from '../use-cases/listar-passageiros.use-case';
-import { ListarPassageiroPorIdUseCase } from '../use-cases/listar-passageiro-por-id.use-case';
-import { AtualizarPassageiroUseCase } from '../use-cases/atualizar-passageiro.use-case';
+import { Post, Body, HttpCode, HttpStatus, Get, Param, ParseIntPipe, NotFoundException, Put, Delete } from '@nestjs/common';
+import { ICriarPassageiroUseCase } from '../contracts/criar-passageiro-use-case.contract';
+import { IAtualizarPassageiroUseCase } from '../contracts/atualizar-passageiro-use-case.contract';
+import { IListarPassageiroPorIdUseCase } from '../contracts/listar-passageiro-por-id-use-case.contract';
+import { IListarPassageirosUseCase } from '../contracts/listar-passageiros-use-case.contract';
+import { IDeletarPassageiroUseCase } from '../contracts/deletar-passageiro-use-case.contract';
+
 import { CriarPassageiroDto } from '../dto/criar-passageiro.dto';
 import { AtualizarPassageiroDto } from '../dto/atualizar-passageiro.dto';
 import { PassageiroResponseDto } from '../dto/passageiro-response.dto';
-import { DeletarPassageiroUseCase } from '../use-cases/deletar-passageiro.use-case';
 
-@Controller('passageiros')
 export class PassageiroController {
   constructor(
-    private readonly criarPassageiroUseCase: CriarPassageiroUseCase,
-    private readonly listarPassageirosUseCase: ListarPassageirosUseCase,
-    private readonly listarPassageiroPorIdUseCase: ListarPassageiroPorIdUseCase,
-    private readonly atualizarPassageiroUseCase: AtualizarPassageiroUseCase,
-    private readonly deletarPassageiroUseCase: DeletarPassageiroUseCase,
+    private readonly criarPassageiroUseCase: ICriarPassageiroUseCase,
+    private readonly listarPassageirosUseCase: IListarPassageirosUseCase,
+    private readonly listarPassageiroPorIdUseCase: IListarPassageiroPorIdUseCase,
+    private readonly atualizarPassageiroUseCase: IAtualizarPassageiroUseCase,
+    private readonly deletarPassageiroUseCase: IDeletarPassageiroUseCase,
   ) {}
 
-  @Post()
-  @HttpCode(HttpStatus.CREATED)
-  async criar(@Body() data: CriarPassageiroDto): Promise<PassageiroResponseDto> {
+  async criar(data: CriarPassageiroDto): Promise<PassageiroResponseDto> {
     const passageiro = await this.criarPassageiroUseCase.execute(data);
     
-    return new PassageiroResponseDto({
+    const criarPassageiro = new PassageiroResponseDto({
       id: passageiro.id,
       nome: passageiro.nome,
       email: passageiro.email,
@@ -31,13 +29,14 @@ export class PassageiroController {
       telefone: passageiro.telefone,
       createdAt: passageiro.createdAt,
     });
+
+    return criarPassageiro;
   }
 
-  @Get()
   async listar(): Promise<PassageiroResponseDto[]> {
     const passageiros = await this.listarPassageirosUseCase.execute();
     
-    return passageiros.map(passageiro => new PassageiroResponseDto({
+    const listarPassageiro = passageiros.map(passageiro => new PassageiroResponseDto({
       id: passageiro.id,
       nome: passageiro.nome,
       email: passageiro.email,
@@ -45,17 +44,18 @@ export class PassageiroController {
       telefone: passageiro.telefone,
       createdAt: passageiro.createdAt,
     }));
+
+    return listarPassageiro;
   }
 
-  @Get(':id')
-  async listarPorId(@Param('id', ParseIntPipe) id: number): Promise<PassageiroResponseDto> {
+  async listarPorId(id: number): Promise<PassageiroResponseDto> {
     const passageiro = await this.listarPassageiroPorIdUseCase.execute(id);
     
     if (!passageiro) {
       throw new NotFoundException('Passageiro não encontrado');
     }
     
-    return new PassageiroResponseDto({
+    const listarPorId = new PassageiroResponseDto({
       id: passageiro.id,
       nome: passageiro.nome,
       email: passageiro.email,
@@ -63,16 +63,14 @@ export class PassageiroController {
       telefone: passageiro.telefone,
       createdAt: passageiro.createdAt,
     });
+
+    return listarPorId
   }
 
-  @Put(':id')
-  async atualizar(
-    @Param('id', ParseIntPipe) id: number,
-    @Body() data: AtualizarPassageiroDto,
-  ): Promise<PassageiroResponseDto> {
-    const passageiro = await this.atualizarPassageiroUseCase.execute(id, data);
+  async atualizar(id: number, data: AtualizarPassageiroDto): Promise<PassageiroResponseDto> {
+      const passageiro = await this.atualizarPassageiroUseCase.execute(id, data);
     
-    return new PassageiroResponseDto({
+    const atualizarPassageiro = new PassageiroResponseDto({
       id: passageiro.id,
       nome: passageiro.nome,
       email: passageiro.email,
@@ -80,15 +78,18 @@ export class PassageiroController {
       telefone: passageiro.telefone,
       createdAt: passageiro.createdAt,
     });
+
+    return atualizarPassageiro
   }
 
-  @Delete(':id')
-  async deletar(@Param('id', ParseIntPipe) id: number): Promise<{ success: boolean; message: string }> {
+  async deletar(id: number): Promise<{ success: boolean; message: string }> {
     const success = await this.deletarPassageiroUseCase.execute(id);
     
-    return {
+    const deletado = {
       success,
       message: success ? 'Passageiro deletado com sucesso' : 'Erro ao deletar passageiro'
     };
+
+    return deletado
   }
 }
