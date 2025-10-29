@@ -1,5 +1,5 @@
-import { VooEntity } from "../entities/voo.entity";
+import { VooEntity } from '../entities/voo.entity';
 
-export interface ListarVooUseCaseContract {
-    execute(): Promise<VooEntity[]>;
+export interface IListarVooUseCaseContract {
+  execute(): Promise<VooEntity[]>;
 }

@@ -1,14 +1,16 @@
-import type { VooEntity } from '../entities/voo.entity';
+import { VooEntity } from '../entities/voo.entity';
 
-export interface AtualizarVooUseCaseContract {
-  execute(id: number, data: {
-    numeroVoo?: string;
-    origem?: string;
-    destino?: string;
-    dataPartida?: Date;
-    dataChegada?: Date;
-    assentosDisponiveis?: number;
-    preco?: number;
-    status?: string;
-  }): Promise<VooEntity>;
+export type TAtualizarVooUseCaseParams = {
+  numeroVoo?: string;
+  origem?: string;
+  destino?: string;
+  dataPartida?: Date;
+  dataChegada?: Date;
+  assentosDisponiveis?: number;
+  preco?: number;
+  status?: string;
+};
+
+export interface IAtualizarVooUseCaseContract {
+  execute(id: number, params: TAtualizarVooUseCaseParams): Promise<VooEntity>;
 }

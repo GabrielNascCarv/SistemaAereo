@@ -1,12 +1,12 @@
 import { Injectable } from '@nestjs/common';
-import type { ListarVooUseCaseContract } from '../contracts/listar-voo-use-case.contract';
+import type { IListarVooUseCaseContract } from '../contracts/listar-voo-use-case.contract';
 import { VooRepository } from '../repositories/voo.repository';
 
 @Injectable()
-export class ListarVooUseCase implements ListarVooUseCaseContract {
-    constructor(private readonly vooRepository: VooRepository) {}
+export class ListarVooUseCase implements IListarVooUseCaseContract {
+  constructor(private readonly vooRepository: VooRepository) {}
 
-    async execute() {
-        return await this.vooRepository.findAll();
-    }
+  async execute() {
+    return await this.vooRepository.findAll();
+  }
 }
