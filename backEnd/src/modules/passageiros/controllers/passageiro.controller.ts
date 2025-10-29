@@ -36,7 +36,7 @@ export class PassageiroController {
   async criar(@Body() data: CriarPassageiroDto): Promise<PassageiroResponseDto> {
     const passageiro = await this.criarPassageiroUseCase.execute(data);
     
-    return new PassageiroResponseDto({
+    const criarPassageiro = new PassageiroResponseDto({
       id: passageiro.id,
       nome: passageiro.nome,
       email: passageiro.email,
@@ -44,13 +44,15 @@ export class PassageiroController {
       telefone: passageiro.telefone,
       createdAt: passageiro.createdAt,
     });
+
+    return criarPassageiro
   }
 
   @Get()
   async listar(): Promise<PassageiroResponseDto[]> {
     const passageiros = await this.listarPassageirosUseCase.execute();
     
-    return passageiros.map(passageiro => new PassageiroResponseDto({
+    const listarPassageiros = passageiros.map(passageiro => new PassageiroResponseDto({
       id: passageiro.id,
       nome: passageiro.nome,
       email: passageiro.email,
@@ -58,6 +60,8 @@ export class PassageiroController {
       telefone: passageiro.telefone,
       createdAt: passageiro.createdAt,
     }));
+
+    return listarPassageiros;
   }
 
   @Get(':id')
@@ -68,7 +72,7 @@ export class PassageiroController {
       throw new NotFoundException('Passageiro não encontrado');
     }
     
-    return new PassageiroResponseDto({
+    const listarPassageiroPorId = new PassageiroResponseDto({
       id: passageiro.id,
       nome: passageiro.nome,
       email: passageiro.email,
@@ -76,6 +80,7 @@ export class PassageiroController {
       telefone: passageiro.telefone,
       createdAt: passageiro.createdAt,
     });
+    return listarPassageiroPorId;
   }
 
   @Put(':id')
@@ -85,7 +90,7 @@ export class PassageiroController {
   ): Promise<PassageiroResponseDto> {
     const passageiro = await this.atualizarPassageiroUseCase.execute(id, data);
     
-    return new PassageiroResponseDto({
+    const atualizarPassageiro = new PassageiroResponseDto({
       id: passageiro.id,
       nome: passageiro.nome,
       email: passageiro.email,
@@ -93,15 +98,17 @@ export class PassageiroController {
       telefone: passageiro.telefone,
       createdAt: passageiro.createdAt,
     });
+    return atualizarPassageiro;
   }
 
   @Delete(':id')
   async deletar(@Param('id', ParseIntPipe) id: number): Promise<{ success: boolean; message: string }> {
     const success = await this.deletarPassageiroUseCase.execute(id);
     
-    return {
+    const deletarPassageiro = {
       success,
       message: success ? 'Passageiro deletado com sucesso' : 'Erro ao deletar passageiro'
     };
+    return deletarPassageiro;
   }
 }
