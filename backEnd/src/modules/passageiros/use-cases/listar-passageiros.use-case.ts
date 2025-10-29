@@ -1,9 +1,9 @@
 import { Injectable } from '@nestjs/common';
-import type { ListarPassageirosUseCaseContract } from '../contracts/listar-passageiros-use-case.contract';
+import type { IListarPassageirosUseCase } from '../contracts/listar-passageiros-use-case.contract';
 import { PassageiroRepository } from '../repositories/passageiro.repository';
 
 @Injectable()
-export class ListarPassageirosUseCase implements ListarPassageirosUseCaseContract {
+export class ListarPassageirosUseCase implements IListarPassageirosUseCase {
     constructor(private readonly passageiroRepository: PassageiroRepository) {}
 
     async execute() {

@@ -1,25 +1,39 @@
 import { Controller, Post, Body, HttpCode, HttpStatus, Get, Put, Param, ParseIntPipe, Delete } from '@nestjs/common';
-import { CriarVooUseCase } from '../use-cases/criar-voo.use-case';
-import { ListarVooUseCase } from '../use-cases/listar-voos-use-case';
-import { AtualizarVooUseCase } from '../use-cases/atualizar-voo.use-case';
+import { CriarVooUseCaseFactory } from '../use-cases/factory/criar-voo.use-case.factory';
+import { ListarVooUseCaseFactory } from '../use-cases/factory/listar-voo.use-case.factory';
+import { AtualizarVooUseCaseFactory } from '../use-cases/factory/atualizar-voo.use-case.factory';
+import { DeletarVooUseCaseFactory } from '../use-cases/factory/deletar-voo.use-case.factory';
+import type { ICriarVooUseCaseContract } from '../contracts/criar-voo-use-case.contract';
+import type { IListarVooUseCaseContract } from '../contracts/listar-voo-use-case.contract';
+import type { IAtualizarVooUseCaseContract } from '../contracts/atualizar-voo-use-case.contract';
+import type { IDeletarVooUseCaseContract } from '../contracts/deletar-voo-use-case.contract';
 import { CriarVooDto } from '../dto/criar-voo.dto';
 import { AtualizarVooDto } from '../dto/atualizar-voo.dto';
 import { VooResponseDto } from '../dto/voo-response.dto';
-import { DeletarVooUseCase } from '../use-cases/deletar-voo.use-case';
 
 @Controller('voos')
 export class VooController {
   constructor(
-    private readonly criarVooUseCase: CriarVooUseCase,
-    private readonly listarVooUseCase: ListarVooUseCase,
-    private readonly atualizarVooUseCase: AtualizarVooUseCase,
-    private readonly deletarVooUseCase: DeletarVooUseCase,
+    private readonly criarVooUseCaseFactory: CriarVooUseCaseFactory,
+    private readonly listarVooUseCaseFactory: ListarVooUseCaseFactory,
+    private readonly atualizarVooUseCaseFactory: AtualizarVooUseCaseFactory,
+    private readonly deletarVooUseCaseFactory: DeletarVooUseCaseFactory,
   ) {}
 
   @Post()
   @HttpCode(HttpStatus.CREATED)
   async criar(@Body() data: CriarVooDto): Promise<VooResponseDto> {
-    const voo = await this.criarVooUseCase.execute(data);
+    const criarVooUseCase: ICriarVooUseCaseContract = this.criarVooUseCaseFactory.create();
+    const voo = await criarVooUseCase.execute({
+      numeroVoo: data.numeroVoo,
+      origem: data.origem,
+      destino: data.destino,
+      dataPartida: data.dataPartida,
+      dataChegada: data.dataChegada,
+      assentosDisponiveis: data.assentosDisponiveis,
+      preco: data.preco,
+      status: data.status,
+    });
     
     return new VooResponseDto({
       id: voo.id,
@@ -37,7 +51,8 @@ export class VooController {
 
   @Get()
   async listar(): Promise<VooResponseDto[]> {
-    const voos = await this.listarVooUseCase.execute();
+    const listarVooUseCase: IListarVooUseCaseContract = this.listarVooUseCaseFactory.create();
+    const voos = await listarVooUseCase.execute();
     
     return voos.map(voo => new VooResponseDto({
       id: voo.id,
@@ -58,7 +73,17 @@ export class VooController {
     @Param('id', ParseIntPipe) id: number,
     @Body() data: AtualizarVooDto,
   ): Promise<VooResponseDto> {
-    const voo = await this.atualizarVooUseCase.execute(id, data);
+    const atualizarVooUseCase: IAtualizarVooUseCaseContract = this.atualizarVooUseCaseFactory.create();
+    const voo = await atualizarVooUseCase.execute(id, {
+      numeroVoo: data.numeroVoo,
+      origem: data.origem,
+      destino: data.destino,
+      dataPartida: data.dataPartida,
+      dataChegada: data.dataChegada,
+      assentosDisponiveis: data.assentosDisponiveis,
+      preco: data.preco,
+      status: data.status,
+    });
     
     return new VooResponseDto({
       id: voo.id,
@@ -75,8 +100,9 @@ export class VooController {
   }
 
   @Delete(':id')
+  @HttpCode(HttpStatus.NO_CONTENT)
   async deletar(@Param('id', ParseIntPipe) id: number): Promise<void> {
-    await this.deletarVooUseCase.execute(id);
+    const deletarVooUseCase: IDeletarVooUseCaseContract = this.deletarVooUseCaseFactory.create();
+    await deletarVooUseCase.execute({ id });
   }
-
 }

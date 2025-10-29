@@ -1,18 +1,17 @@
 import { Injectable } from '@nestjs/common';
 import { PrismaService } from '../../../core/database/prisma.service';
-import { PassageiroRepositoryContract } from '../contracts/passageiro-repository.contract';
+import { 
+  IPassageiroRepository,
+  TCreatePassageiroRepository,
+  TUpdatePassageiroRepository
+ } from '../contracts/passageiro-repository.contract';
 import { PassageiroEntity } from '../entities/passageiro.entity';
 
 @Injectable()
-export class PassageiroRepository implements PassageiroRepositoryContract {
+export class PassageiroRepository implements IPassageiroRepository {
   constructor(private readonly prisma: PrismaService) {}
 
-  async create(data: {
-    nome: string;
-    email: string;
-    cpf: string;
-    telefone?: string;
-  }): Promise<PassageiroEntity> {
+  async create(data: TCreatePassageiroRepository): Promise<PassageiroEntity> {
     const passageiro = await this.prisma.passageiro.create({
       data,
     });
@@ -52,12 +51,7 @@ export class PassageiroRepository implements PassageiroRepositoryContract {
     return passageiros.map(passageiro => PassageiroEntity.create(passageiro));
   }
 
-  async update(id: number, data: {
-    nome?: string;
-    email?: string;
-    cpf?: string;
-    telefone?: string;
-  }): Promise<PassageiroEntity> {
+  async update(id: number, data: Partial<TUpdatePassageiroRepository>): Promise<PassageiroEntity> {
     const passageiro = await this.prisma.passageiro.update({
       where: { id },
       data,

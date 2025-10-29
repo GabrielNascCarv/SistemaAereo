@@ -1,5 +1,4 @@
 import { Module } from '@nestjs/common';
-import { PassageiroController } from './controllers/passageiro.controller';
 import { PassageiroRepository } from './repositories/passageiro.repository';
 import { CriarPassageiroUseCase } from './use-cases/criar-passageiro.use-case';
 import { CriarPassageiroUseCaseFactory } from './use-cases/factory/criar-passageiro.use-case.factory';
@@ -11,9 +10,10 @@ import { AtualizarPassageiroUseCase } from './use-cases/atualizar-passageiro.use
 import { AtualizarPassageiroUseCaseFactory } from './use-cases/factory/atualizar-passageiro.use-case.factory';
 import { DeletarPassageiroUseCase } from './use-cases/deletar-passageiro.use-case';
 import { DeletarPassageiroUseCaseFactory } from './use-cases/factory/deletar-passageiro.use-case.factory';
+import { PassageiroRoutesController } from './controllers/passageiro-routes.controller';
 
 @Module({
-  controllers: [PassageiroController],
+  controllers: [PassageiroRoutesController],
   providers: [
     PassageiroRepository,
     CriarPassageiroUseCase,

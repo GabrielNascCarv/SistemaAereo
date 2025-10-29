@@ -1,5 +1,5 @@
 import { PassageiroEntity } from "../entities/passageiro.entity";
 
-export interface ListarPassageirosUseCaseContract {
+export interface IListarPassageirosUseCase {
     execute(): Promise<PassageiroEntity[]>;
 }

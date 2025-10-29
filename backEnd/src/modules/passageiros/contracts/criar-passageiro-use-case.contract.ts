@@ -1,10 +1,12 @@
 import { PassageiroEntity } from '../entities/passageiro.entity';
 
-export interface CriarPassageiroUseCaseContract {
-  execute(data: {
-    nome: string;
-    email: string;
-    cpf: string;
-    telefone?: string;
-  }): Promise<PassageiroEntity>;
+export type TCreatePassageiroUseCase = {
+  nome: string;
+  email: string;
+  cpf: string;
+  telefone?: string;
+}
+
+export interface ICriarPassageiroUseCase {
+  execute(data: TCreatePassageiroUseCase): Promise<PassageiroEntity>;
 }

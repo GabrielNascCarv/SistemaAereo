@@ -1,22 +1,13 @@
 import { Injectable } from '@nestjs/common';
 import { PrismaService } from '../../../core/database/prisma.service';
 import { VooEntity } from '../entities/voo.entity';
-import type { VooRepositoryContract } from '../contracts/voo-repository.contract';
+import type { IVooRepositoryContract, TCriarVooParams, TAtualizarVooParams } from '../contracts/voo-repository.contract';
 
 @Injectable()
-export class VooRepository implements VooRepositoryContract {
+export class VooRepository implements IVooRepositoryContract {
   constructor(private readonly prisma: PrismaService) {}
 
-  async create(data: {
-    numeroVoo: string;
-    origem: string;
-    destino: string;
-    dataPartida: Date;
-    dataChegada: Date;
-    assentosDisponiveis: number;
-    preco: number;
-    status: string;
-  }): Promise<VooEntity> {
+  async create(data: TCriarVooParams): Promise<VooEntity> {
     const voo = await this.prisma.voo.create({
       data,
     });
@@ -104,16 +95,7 @@ export class VooRepository implements VooRepositoryContract {
     }));
   }
 
-  async update(id: number, data: Partial<{
-    numeroVoo: string;
-    origem: string;
-    destino: string;
-    dataPartida: Date;
-    dataChegada: Date;
-    assentosDisponiveis: number;
-    preco: number;
-    status: string;
-  }>): Promise<VooEntity> {
+  async update(id: number, data: TAtualizarVooParams): Promise<VooEntity> {
     const voo = await this.prisma.voo.update({
       where: { id },
       data,

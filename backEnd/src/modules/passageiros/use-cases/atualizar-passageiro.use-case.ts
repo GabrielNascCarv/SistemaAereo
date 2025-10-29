@@ -1,26 +1,21 @@
 import { Injectable, NotFoundException, ConflictException } from '@nestjs/common';
-import type { AtualizarPassageiroUseCaseContract } from '../contracts/atualizar-passageiro-use-case.contract';
+import type { IAtualizarPassageiroUseCase, TAtualizarPassageiroUseCase } from '../contracts/atualizar-passageiro-use-case.contract';
+import { PassageiroEntity } from '../entities/passageiro.entity';
 import { PassageiroRepository } from '../repositories/passageiro.repository';
 
 @Injectable()
-export class AtualizarPassageiroUseCase implements AtualizarPassageiroUseCaseContract {
+export class AtualizarPassageiroUseCase implements IAtualizarPassageiroUseCase {
   constructor(
     private readonly passageiroRepository: PassageiroRepository,
   ) {}
 
-  async execute(id: number, data: {
-    nome?: string;
-    email?: string;
-    cpf?: string;
-    telefone?: string;
-  }) {
-    // Verificar se o passageiro existe
+  async execute(id: number, data: TAtualizarPassageiroUseCase): Promise <PassageiroEntity> {
+   
     const passageiroExistente = await this.passageiroRepository.findById(id);
     if (!passageiroExistente) {
       throw new NotFoundException('Passageiro não encontrado');
     }
 
-    // Verificar se email já existe (se estiver sendo atualizado)
     if (data.email && data.email !== passageiroExistente.email) {
       const passageiroComEmail = await this.passageiroRepository.findByEmail(data.email);
       if (passageiroComEmail) {
@@ -28,7 +23,6 @@ export class AtualizarPassageiroUseCase implements AtualizarPassageiroUseCaseCon
       }
     }
 
-    // Verificar se CPF já existe (se estiver sendo atualizado)
     if (data.cpf && data.cpf !== passageiroExistente.cpf) {
       const passageiroComCpf = await this.passageiroRepository.findByCpf(data.cpf);
       if (passageiroComCpf) {
@@ -36,7 +30,15 @@ export class AtualizarPassageiroUseCase implements AtualizarPassageiroUseCaseCon
       }
     }
 
-    const passageiro = await this.passageiroRepository.update(id, data);
+    // Preparar dados para atualização - mantém valores existentes se não fornecidos
+    const dataAtualizacao = {
+      nome: data.nome ?? passageiroExistente.nome,
+      email: data.email ?? passageiroExistente.email,
+      cpf: data.cpf ?? passageiroExistente.cpf,
+      telefone: data.telefone ?? passageiroExistente.telefone ?? undefined,
+    };
+
+    const passageiro = await this.passageiroRepository.update(id, dataAtualizacao);
     return passageiro;
   }
 }

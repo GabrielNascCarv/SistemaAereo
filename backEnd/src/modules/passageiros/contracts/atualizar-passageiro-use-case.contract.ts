@@ -1,10 +1,12 @@
 import { PassageiroEntity } from '../entities/passageiro.entity';
 
-export interface AtualizarPassageiroUseCaseContract {
-  execute(id: number, data: {
-    nome?: string;
-    email?: string;
-    cpf?: string;
-    telefone?: string;
-  }): Promise<PassageiroEntity>;
+export type TAtualizarPassageiroUseCase = {
+  nome?: string;
+  email?: string;
+  cpf?: string;
+  telefone?: string;
+}
+
+export interface IAtualizarPassageiroUseCase {
+  execute(id: number, data: TAtualizarPassageiroUseCase ): Promise<PassageiroEntity>;
 }

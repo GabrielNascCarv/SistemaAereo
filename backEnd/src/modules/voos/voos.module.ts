@@ -1,6 +1,5 @@
 import { Module } from '@nestjs/common';
 import { VooController } from './controllers/voo.controller';
-import { VooControllerFactory } from './controllers/voo.controller.factory';
 import { VooRepository } from './repositories/voo.repository';
 import { CriarVooUseCase } from './use-cases/criar-voo.use-case';
 import { CriarVooUseCaseFactory } from './use-cases/factory/criar-voo.use-case.factory';
@@ -21,7 +20,6 @@ import { DeletarVooUseCaseFactory } from './use-cases/factory/deletar-voo.use-ca
     ListarVooUseCaseFactory,
     AtualizarVooUseCase,
     AtualizarVooUseCaseFactory,
-    VooControllerFactory,
     DeletarVooUseCase,
     DeletarVooUseCaseFactory,
   ],

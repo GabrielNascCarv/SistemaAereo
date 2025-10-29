@@ -1,14 +1,16 @@
 import { VooEntity } from '../entities/voo.entity';
 
-export interface CriarVooUseCaseContract {
-  execute(data: {
-    numeroVoo: string;
-    origem: string;
-    destino: string;
-    dataPartida: string;
-    dataChegada: string;
-    assentosDisponiveis: number;
-    preco: number;
-    status?: string;
-  }): Promise<VooEntity>;
+export type TCriarVooUseCaseParams = {
+  numeroVoo: string;
+  origem: string;
+  destino: string;
+  dataPartida: string;
+  dataChegada: string;
+  assentosDisponiveis: number;
+  preco: number;
+  status?: string;
+};
+
+export interface ICriarVooUseCaseContract {
+  execute(params: TCriarVooUseCaseParams): Promise<VooEntity>;
 }
