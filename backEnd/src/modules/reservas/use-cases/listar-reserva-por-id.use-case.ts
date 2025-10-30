@@ -1,9 +1,9 @@
 import { Injectable, NotFoundException } from '@nestjs/common';
-import type { ListarReservaPorIdUseCaseContract } from '../contracts/listar-reserva-por-id-use-case.contract';
+import type { IListarReservaPorIdUseCase } from '../contracts/listar-reserva-por-id-use-case.contract';
 import { ReservaRepository } from '../repositories/reserva.repository';
 
 @Injectable()
-export class ListarReservaPorIdUseCase implements ListarReservaPorIdUseCaseContract {
+export class ListarReservaPorIdUseCase implements IListarReservaPorIdUseCase {
   constructor(
     private readonly reservaRepository: ReservaRepository,
   ) {}

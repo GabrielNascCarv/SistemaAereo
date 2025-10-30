@@ -8,7 +8,7 @@ export class ListarReservaPorIdUseCaseFactory {
         private readonly reservaRepository: ReservaRepository,
     ) {}
 
-    create(): ListarReservaPorIdUseCase {
-        return new ListarReservaPorIdUseCase(this.reservaRepository);
-      }
+    create(): ListarReservaPorIdUseCase{
+        return new ListarReservaPorIdUseCase(this.reservaRepository)
+    }
 }

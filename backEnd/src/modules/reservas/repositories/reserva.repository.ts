@@ -1,11 +1,11 @@
 import { Injectable } from "@nestjs/common";
 import { PrismaService } from "../../../core/database/prisma.service";
-import { ReservaEntity } from "../entities/reserva.entity";
 import { 
     IReservaRepository, 
     TCriarReservaParams, 
     TAtualizarReservaParams 
 } from "../contracts/reserva-repository.contract";
+import { ReservaEntity } from "../entities/reserva.entity";
 
 @Injectable()
 export class ReservaRepository implements IReservaRepository {

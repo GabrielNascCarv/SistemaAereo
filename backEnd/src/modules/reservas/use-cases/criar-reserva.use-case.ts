@@ -1,21 +1,19 @@
 import { Injectable, NotFoundException, BadRequestException } from "@nestjs/common";
-import { CriarReservaUseCaseContract } from "../contracts/criar-reserva-use-case.contract";
+import { ICriarReservaUseCase, TCriarReservaParams } from "../contracts/criar-reserva-use-case.contract";
 import { ReservaEntity } from "../entities/reserva.entity";
 import { ReservaRepository } from "../repositories/reserva.repository";
-import { CriarReservaDto } from "../dto/criar-reserva.dto";
 import { VooRepository } from "../../voos/repositories/voo.repository";
 import { PassageiroRepository } from "../../passageiros/repositories/passageiro.repository";
-import { CriarReservaParams } from '../contracts/reserva-repository.contract';
 
 @Injectable()
-export class CriarReservaUseCase implements CriarReservaUseCaseContract {
+export class CriarReservaUseCase implements ICriarReservaUseCase {
   constructor(
     private readonly reservaRepository: ReservaRepository,
     private readonly vooRepository: VooRepository,
     private readonly passageiroRepository: PassageiroRepository
   ) {}
   
-  async execute(data: CriarReservaDto): Promise<ReservaEntity> {
+  async execute(data: TCriarReservaParams): Promise<ReservaEntity> {
     const voo = await this.vooRepository.findById(data.vooId);
 
     if (!voo) {
@@ -38,13 +36,8 @@ export class CriarReservaUseCase implements CriarReservaUseCaseContract {
       throw new NotFoundException(`Passageiro com ID ${data.passageiroId} não encontrado`);
     }
 
-    const createData: CriarReservaParams = {
-        codigoReserva: data.codigoReserva,
-        numeroPassageiros: data.numeroPassageiros,
-        vooId: data.vooId,
-        passageiroId: data.passageiroId,
-    };
+    const reserva = await this.reservaRepository.create(data);
 
-    return await this.reservaRepository.create(createData);
+    return reserva;
   }
 }
