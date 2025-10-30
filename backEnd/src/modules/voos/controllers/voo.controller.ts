@@ -22,16 +22,7 @@ export class VooController {
   @HttpCode(HttpStatus.CREATED)
   async criar(@Body() data: CriarVooDto): Promise<VooResponseDto> {
     const criarVooUseCase = this.criarVooUseCaseFactory.create();
-    const voo = await criarVooUseCase.execute({
-      numeroVoo: data.numeroVoo,
-      origem: data.origem,
-      destino: data.destino,
-      dataPartida: data.dataPartida,
-      dataChegada: data.dataChegada,
-      assentosDisponiveis: data.assentosDisponiveis,
-      preco: data.preco,
-      status: data.status,
-    });
+    const voo = await criarVooUseCase.execute(data);
     
     const vooResponse = new VooResponseDto({
       id: voo.id,
@@ -79,16 +70,7 @@ export class VooController {
     @Body() data: AtualizarVooDto,
   ): Promise<VooResponseDto> {
     const atualizarVooUseCase = this.atualizarVooUseCaseFactory.create();
-    const voo = await atualizarVooUseCase.execute(id, {
-      numeroVoo: data.numeroVoo,
-      origem: data.origem,
-      destino: data.destino,
-      dataPartida: data.dataPartida,
-      dataChegada: data.dataChegada,
-      assentosDisponiveis: data.assentosDisponiveis,
-      preco: data.preco,
-      status: data.status,
-    });
+    const voo = await atualizarVooUseCase.execute(id, data);
     
     const vooResponse = new VooResponseDto({
       id: voo.id,
@@ -107,9 +89,13 @@ export class VooController {
   }
 
   @Delete(':id')
-  @HttpCode(HttpStatus.NO_CONTENT)
-  async deletar(@Param('id', ParseIntPipe) id: number): Promise<void> {
-    const deletarVooUseCase = this.deletarVooUseCaseFactory.create();
-    await deletarVooUseCase.execute({ id });
+  async deletar(@Param('id', ParseIntPipe) id: number): Promise<{ success: boolean}> {
+      const deletarVooUseCase = this.deletarVooUseCaseFactory.create();
+      const success = await deletarVooUseCase.execute({ id });
+      
+      const deletarVoo = {
+          success
+      };
+      return deletarVoo;
   }
 }
