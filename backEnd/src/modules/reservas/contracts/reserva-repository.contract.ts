@@ -1,7 +1,7 @@
 import { ReservaEntity } from "../entities/reserva.entity";
 
 export type TCriarReservaParams = {
-    codigoReserva?: string;
+    codigoReserva: string;
     numeroPassageiros: number;
     vooId: number;
     passageiroId: number;
@@ -20,5 +20,6 @@ export interface IReservaRepository {
     findAll(): Promise<ReservaEntity[]>;
     findById(id: number): Promise<ReservaEntity | null>;
     update(id: number, data: TAtualizarReservaParams): Promise<ReservaEntity>;
-    findByCodigoReserva(codigoReserva: string): Promise<ReservaEntity | null>;
+    findByCodigoReserva(crodigoReserva: string): Promise<ReservaEntity | null>;
+    delete(id: number): Promise<boolean>;
 }

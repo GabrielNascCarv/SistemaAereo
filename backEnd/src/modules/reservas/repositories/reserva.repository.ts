@@ -9,15 +9,15 @@ import { ReservaEntity } from "../entities/reserva.entity";
 
 @Injectable()
 export class ReservaRepository implements IReservaRepository {
-    constructor(private readonly prisma: PrismaService) {}
+  constructor(private readonly prisma: PrismaService) {}
 
-    async create(data: TCriarReservaParams): Promise<ReservaEntity> {
-        const reserva = await this.prisma.reserva.create({
-            data,
-        });
-      
-        return ReservaEntity.create(reserva);
-    }
+  async create(data: TCriarReservaParams): Promise<ReservaEntity> {
+    const reserva = await this.prisma.reserva.create({
+        data,
+    });
+
+    return ReservaEntity.create(reserva);
+  }
 
     async findById(id: number): Promise<ReservaEntity | null> {
         const reserva = await this.prisma.reserva.findUnique({
@@ -48,5 +48,16 @@ export class ReservaRepository implements IReservaRepository {
             where: { codigoReserva },
         });
         return reserva ? ReservaEntity.create(reserva) : null;
+    }
+
+    async delete(id: number): Promise<boolean> {
+        try {
+            await this.prisma.reserva.delete({
+                where: { id },
+            });
+            return true;
+        } catch (error) {
+            return false;
+        }
     }
 }

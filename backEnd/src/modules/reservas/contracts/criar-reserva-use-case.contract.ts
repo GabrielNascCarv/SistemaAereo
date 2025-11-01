@@ -1,7 +1,7 @@
 import { ReservaEntity } from "../entities/reserva.entity";
 
 export type TCriarReservaParams = {
-    codigoReserva?: string;
+    codigoReserva: string;
     numeroPassageiros: number;
     vooId: number;
     passageiroId: number;
