@@ -9,7 +9,10 @@ export function Layout() {
             <span aria-hidden>✈️</span> Sistema Aéreo
           </Link>
           <div className="flex items-center gap-4">
-            <Link to="/reservas" className="text-sm text-slate-600 hover:text-slate-900">
+            <Link
+              to="/reservas"
+              className="rounded-lg border border-slate-300 px-3 py-1.5 text-sm text-slate-600 transition-colors hover:border-slate-400 hover:text-slate-900"
+            >
               Reservas
             </Link>
             <span className="text-xs text-slate-400">projeto de portfólio</span>
