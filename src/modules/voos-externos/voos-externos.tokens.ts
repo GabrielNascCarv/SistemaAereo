@@ -1,0 +1,1 @@
+export const BUSCA_VOOS_GATEWAY = Symbol('BUSCA_VOOS_GATEWAY');
