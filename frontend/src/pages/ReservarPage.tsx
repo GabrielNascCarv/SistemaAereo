@@ -10,7 +10,7 @@ import { Botao } from '../components/Botao';
 
 export function ReservarPage() {
   const navigate = useNavigate();
-  const { oferta, setVoo, setReserva } = useFluxoReserva();
+  const { oferta, setTrechos, setReserva } = useFluxoReserva();
 
   const [nome, setNome] = useState('');
   const [email, setEmail] = useState('');
@@ -32,7 +32,7 @@ export function ReservarPage() {
     setEnviando(true);
 
     try {
-      const voo = await importarOferta(oferta!.ofertaId);
+      const trechosImportados = await importarOferta(oferta!.ofertaId);
       const passageiro = await criarPassageiro({
         nome,
         email,
@@ -40,12 +40,16 @@ export function ReservarPage() {
         telefone: telefone || undefined,
       });
       const reserva = await criarReserva({
-        vooId: voo.id,
         passageiroId: passageiro.id,
         numeroPassageiros,
+        trechos: trechosImportados.map((trecho) => ({
+          vooId: trecho.vooId,
+          direcao: trecho.direcao,
+          ordem: trecho.ordem,
+        })),
       });
 
-      setVoo(voo);
+      setTrechos(trechosImportados);
       setReserva(reserva);
       navigate('/confirmacao');
     } catch (erro) {
@@ -64,12 +68,19 @@ export function ReservarPage() {
       <h1 className="mt-3 text-2xl font-semibold tracking-tight">Seus dados</h1>
 
       <div className="mt-4 rounded-xl border border-slate-200 bg-white p-4">
-        <p className="font-medium">
-          {oferta.companhia} · {oferta.numeroVoo}
-        </p>
-        <p className="text-sm text-slate-500">
-          {oferta.origem} → {oferta.destino}
-        </p>
+        {oferta.slices.map((slice) => (
+          <div key={slice.direcao} className="mb-2 last:mb-0">
+            <p className="text-xs font-medium uppercase tracking-wide text-slate-400">
+              {slice.direcao === 'IDA' ? 'Ida' : 'Volta'}
+            </p>
+            <p className="font-medium">
+              {slice.segmentos.map((s) => `${s.companhia} ${s.numeroVoo}`).join(' + ')}
+            </p>
+            <p className="text-sm text-slate-500">
+              {slice.segmentos[0].origem} → {slice.segmentos[slice.segmentos.length - 1].destino}
+            </p>
+          </div>
+        ))}
         <p className="mt-1 font-semibold">
           {oferta.preco.toLocaleString('pt-BR', { style: 'currency', currency: oferta.moeda })}
         </p>

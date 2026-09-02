@@ -8,7 +8,9 @@ export function BuscaVoosPage() {
   const navigate = useNavigate();
   const [origem, setOrigem] = useState('');
   const [destino, setDestino] = useState('');
-  const [data, setData] = useState('');
+  const [dataIda, setDataIda] = useState('');
+  const [dataVolta, setDataVolta] = useState('');
+  const [idaEVolta, setIdaEVolta] = useState(false);
   const [erro, setErro] = useState<string | null>(null);
 
   function handleSubmit(evento: FormEvent) {
@@ -19,12 +21,21 @@ export function BuscaVoosPage() {
       setErro('Selecione uma cidade ou aeroporto de origem e destino na lista sugerida');
       return;
     }
-    if (!data) {
-      setErro('Escolha uma data');
+    if (!dataIda) {
+      setErro('Escolha a data de ida');
+      return;
+    }
+    if (idaEVolta && !dataVolta) {
+      setErro('Escolha a data de volta');
       return;
     }
 
-    const query = new URLSearchParams({ origem, destino, data });
+    const query = new URLSearchParams({
+      origem,
+      destino,
+      dataIda,
+      ...(idaEVolta && dataVolta ? { dataVolta } : {}),
+    });
     navigate(`/resultados?${query.toString()}`);
   }
 
@@ -35,7 +46,17 @@ export function BuscaVoosPage() {
         Busca voos reais via a integração com a Duffel API (ambiente de teste).
       </p>
 
-      <form onSubmit={handleSubmit} className="mt-8 grid gap-4 sm:grid-cols-3">
+      <label className="mt-6 flex w-fit items-center gap-2 text-sm text-slate-700">
+        <input
+          type="checkbox"
+          checked={idaEVolta}
+          onChange={(e) => setIdaEVolta(e.target.checked)}
+          className="h-4 w-4 rounded border-slate-300"
+        />
+        Ida e volta
+      </label>
+
+      <form onSubmit={handleSubmit} className="mt-4 grid gap-4 sm:grid-cols-2">
         <CampoAutocompleteLugar
           label="Origem"
           placeholder="Digite uma cidade ou aeroporto"
@@ -46,11 +67,24 @@ export function BuscaVoosPage() {
           placeholder="Digite uma cidade ou aeroporto"
           onSelecionar={(lugar) => setDestino(lugar.iataCode)}
         />
-        <Campo label="Data" type="date" value={data} onChange={(e) => setData(e.target.value)} />
+        <Campo
+          label="Data de ida"
+          type="date"
+          value={dataIda}
+          onChange={(e) => setDataIda(e.target.value)}
+        />
+        {idaEVolta && (
+          <Campo
+            label="Data de volta"
+            type="date"
+            value={dataVolta}
+            onChange={(e) => setDataVolta(e.target.value)}
+          />
+        )}
 
-        {erro && <p className="sm:col-span-3 text-sm text-red-600">{erro}</p>}
+        {erro && <p className="sm:col-span-2 text-sm text-red-600">{erro}</p>}
 
-        <div className="sm:col-span-3">
+        <div className="sm:col-span-2">
           <Botao type="submit" className="w-full sm:w-auto">
             Buscar voos
           </Botao>

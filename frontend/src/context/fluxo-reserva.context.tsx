@@ -1,12 +1,12 @@
 import { createContext, useContext, useState, type ReactNode } from 'react';
-import type { OfertaVoo, Voo, Reserva } from '../types/api';
+import type { OfertaVoo, TrechoReserva, Reserva } from '../types/api';
 
 interface FluxoReservaState {
   oferta: OfertaVoo | null;
-  voo: Voo | null;
+  trechos: TrechoReserva[] | null;
   reserva: Reserva | null;
   setOferta: (oferta: OfertaVoo) => void;
-  setVoo: (voo: Voo) => void;
+  setTrechos: (trechos: TrechoReserva[]) => void;
   setReserva: (reserva: Reserva) => void;
   reiniciar: () => void;
 }
@@ -15,18 +15,18 @@ const FluxoReservaContext = createContext<FluxoReservaState | null>(null);
 
 export function FluxoReservaProvider({ children }: { children: ReactNode }) {
   const [oferta, setOferta] = useState<OfertaVoo | null>(null);
-  const [voo, setVoo] = useState<Voo | null>(null);
+  const [trechos, setTrechos] = useState<TrechoReserva[] | null>(null);
   const [reserva, setReserva] = useState<Reserva | null>(null);
 
   const reiniciar = () => {
     setOferta(null);
-    setVoo(null);
+    setTrechos(null);
     setReserva(null);
   };
 
   return (
     <FluxoReservaContext.Provider
-      value={{ oferta, voo, reserva, setOferta, setVoo, setReserva, reiniciar }}
+      value={{ oferta, trechos, reserva, setOferta, setTrechos, setReserva, reiniciar }}
     >
       {children}
     </FluxoReservaContext.Provider>

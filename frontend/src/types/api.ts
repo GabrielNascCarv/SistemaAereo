@@ -1,13 +1,25 @@
-export interface OfertaVoo {
-  ofertaId: string;
-  companhia: string;
+export interface SegmentoOferta {
   numeroVoo: string;
+  companhia: string;
   origem: string;
   destino: string;
   dataPartida: string;
   dataChegada: string;
+}
+
+export interface SliceOferta {
+  direcao: 'IDA' | 'VOLTA';
+  segmentos: SegmentoOferta[];
+}
+
+export interface OfertaVoo {
+  ofertaId: string;
   preco: number;
   moeda: string;
+  origem: string;
+  destino: string;
+  idaEVolta: boolean;
+  slices: SliceOferta[];
 }
 
 export interface SugestaoLugar {
@@ -39,14 +51,21 @@ export interface Passageiro {
   createdAt: string;
 }
 
+export interface TrechoReserva {
+  vooId: number;
+  direcao: 'IDA' | 'VOLTA';
+  ordem: number;
+  voo: Voo;
+}
+
 export interface Reserva {
   id: number;
   codigoReserva: string;
   dataReserva: string;
   status: 'PENDENTE_PAGAMENTO' | 'CONFIRMADA' | 'CANCELADA';
   numeroPassageiros: number;
-  vooId: number;
   passageiroId: number;
+  trechos: TrechoReserva[];
   createdAt: string;
 }
 

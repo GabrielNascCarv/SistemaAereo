@@ -1,8 +1,15 @@
 import { api } from './client';
-import type { OfertaVoo, SugestaoLugar, Voo } from '../types/api';
+import type { OfertaVoo, SugestaoLugar, TrechoReserva } from '../types/api';
 
-export function buscarOfertas(params: { origem: string; destino: string; data: string }) {
-  const query = new URLSearchParams(params).toString();
+export function buscarOfertas(params: {
+  origem: string;
+  destino: string;
+  dataIda: string;
+  dataVolta?: string;
+}) {
+  const query = new URLSearchParams(
+    Object.fromEntries(Object.entries(params).filter(([, valor]) => !!valor)),
+  ).toString();
   return api.get<OfertaVoo[]>(`/voos-externos/busca?${query}`);
 }
 
@@ -11,5 +18,5 @@ export function buscarLugares(query: string) {
 }
 
 export function importarOferta(ofertaId: string) {
-  return api.post<Voo>('/voos-externos/importar', { ofertaId });
+  return api.post<TrechoReserva[]>('/voos-externos/importar', { ofertaId });
 }
