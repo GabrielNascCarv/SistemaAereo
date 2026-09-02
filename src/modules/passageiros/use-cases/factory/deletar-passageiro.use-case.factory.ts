@@ -1,6 +1,6 @@
-import { Injectable } from "@nestjs/common";
-import { DeletarPassageiroUseCase } from "../deletar-passageiro.use-case";
-import { PassageiroRepository } from "../../repositories/passageiro.repository";
+import { Injectable } from '@nestjs/common';
+import { DeletarPassageiroUseCase } from '../deletar-passageiro.use-case';
+import { PassageiroRepository } from '../../repositories/passageiro.repository';
 
 @Injectable()
 export class DeletarPassageiroUseCaseFactory {

@@ -13,6 +13,10 @@ export class CriarReservaUseCaseFactory {
   ) {}
 
   create(): CriarReservaUseCase {
-    return new CriarReservaUseCase(this.reservaRepository, this.vooRepository, this.passageiroRepository);
+    return new CriarReservaUseCase(
+      this.reservaRepository,
+      this.vooRepository,
+      this.passageiroRepository,
+    );
   }
 }

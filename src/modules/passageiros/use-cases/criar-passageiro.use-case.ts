@@ -4,9 +4,7 @@ import { PassageiroRepository } from '../repositories/passageiro.repository';
 
 @Injectable()
 export class CriarPassageiroUseCase implements CriarPassageiroUseCaseContract {
-  constructor(
-    private readonly passageiroRepository: PassageiroRepository,
-  ) {}
+  constructor(private readonly passageiroRepository: PassageiroRepository) {}
 
   async execute(data: {
     nome: string;
@@ -15,9 +13,8 @@ export class CriarPassageiroUseCase implements CriarPassageiroUseCaseContract {
     telefone?: string;
   }) {
     // Verificar se email já existe
-    const passageiroExistenteEmail = await this.passageiroRepository.findByEmail(
-      data.email,
-    );
+    const passageiroExistenteEmail =
+      await this.passageiroRepository.findByEmail(data.email);
     if (passageiroExistenteEmail) {
       throw new ConflictException('Email já cadastrado');
     }

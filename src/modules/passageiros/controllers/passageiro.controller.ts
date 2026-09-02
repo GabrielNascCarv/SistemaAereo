@@ -1,4 +1,17 @@
-import { Controller, Post, Body, HttpCode, HttpStatus, Get, Param, ParseIntPipe, NotFoundException, Put, Delete, Query } from '@nestjs/common';
+import {
+  Controller,
+  Post,
+  Body,
+  HttpCode,
+  HttpStatus,
+  Get,
+  Param,
+  ParseIntPipe,
+  NotFoundException,
+  Put,
+  Delete,
+  Query,
+} from '@nestjs/common';
 import { CriarPassageiroUseCase } from '../use-cases/criar-passageiro.use-case';
 import { ListarPassageirosUseCase } from '../use-cases/listar-passageiros.use-case';
 import { ListarPassageiroPorIdUseCase } from '../use-cases/listar-passageiro-por-id.use-case';
@@ -22,9 +35,11 @@ export class PassageiroController {
 
   @Post()
   @HttpCode(HttpStatus.CREATED)
-  async criar(@Body() data: CriarPassageiroDto): Promise<PassageiroResponseDto> {
+  async criar(
+    @Body() data: CriarPassageiroDto,
+  ): Promise<PassageiroResponseDto> {
     const passageiro = await this.criarPassageiroUseCase.execute(data);
-    
+
     return new PassageiroResponseDto({
       id: passageiro.id,
       nome: passageiro.nome,
@@ -36,30 +51,40 @@ export class PassageiroController {
   }
 
   @Get()
-  async listar(@Query() query: PaginacaoQueryDto): Promise<PaginaResultadoDto<PassageiroResponseDto>> {
+  async listar(
+    @Query() query: PaginacaoQueryDto,
+  ): Promise<PaginaResultadoDto<PassageiroResponseDto>> {
     const { page = 1, limit = 15 } = query;
-    const { data, total } = await this.listarPassageirosUseCase.execute({ page, limit });
+    const { data, total } = await this.listarPassageirosUseCase.execute({
+      page,
+      limit,
+    });
 
-    const passageiros = data.map(passageiro => new PassageiroResponseDto({
-      id: passageiro.id,
-      nome: passageiro.nome,
-      email: passageiro.email,
-      cpf: passageiro.cpf,
-      telefone: passageiro.telefone,
-      createdAt: passageiro.createdAt,
-    }));
+    const passageiros = data.map(
+      (passageiro) =>
+        new PassageiroResponseDto({
+          id: passageiro.id,
+          nome: passageiro.nome,
+          email: passageiro.email,
+          cpf: passageiro.cpf,
+          telefone: passageiro.telefone,
+          createdAt: passageiro.createdAt,
+        }),
+    );
 
     return new PaginaResultadoDto(passageiros, total, page, limit);
   }
 
   @Get(':id')
-  async listarPorId(@Param('id', ParseIntPipe) id: number): Promise<PassageiroResponseDto> {
+  async listarPorId(
+    @Param('id', ParseIntPipe) id: number,
+  ): Promise<PassageiroResponseDto> {
     const passageiro = await this.listarPassageiroPorIdUseCase.execute(id);
-    
+
     if (!passageiro) {
       throw new NotFoundException('Passageiro não encontrado');
     }
-    
+
     return new PassageiroResponseDto({
       id: passageiro.id,
       nome: passageiro.nome,
@@ -76,7 +101,7 @@ export class PassageiroController {
     @Body() data: AtualizarPassageiroDto,
   ): Promise<PassageiroResponseDto> {
     const passageiro = await this.atualizarPassageiroUseCase.execute(id, data);
-    
+
     return new PassageiroResponseDto({
       id: passageiro.id,
       nome: passageiro.nome,
@@ -88,12 +113,16 @@ export class PassageiroController {
   }
 
   @Delete(':id')
-  async deletar(@Param('id', ParseIntPipe) id: number): Promise<{ success: boolean; message: string }> {
+  async deletar(
+    @Param('id', ParseIntPipe) id: number,
+  ): Promise<{ success: boolean; message: string }> {
     const success = await this.deletarPassageiroUseCase.execute(id);
-    
+
     return {
       success,
-      message: success ? 'Passageiro deletado com sucesso' : 'Erro ao deletar passageiro'
+      message: success
+        ? 'Passageiro deletado com sucesso'
+        : 'Erro ao deletar passageiro',
     };
   }
 }

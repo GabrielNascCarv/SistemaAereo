@@ -22,7 +22,8 @@ export class DeletarReservaUseCase implements DeletarReservaUseCaseContract {
       const voo = await this.vooRepository.findById(reserva.vooId);
       if (voo) {
         await this.vooRepository.update(voo.id, {
-          assentosDisponiveis: voo.assentosDisponiveis + reserva.numeroPassageiros,
+          assentosDisponiveis:
+            voo.assentosDisponiveis + reserva.numeroPassageiros,
         });
       }
     }

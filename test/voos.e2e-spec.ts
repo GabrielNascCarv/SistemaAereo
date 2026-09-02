@@ -3,6 +3,9 @@ import request from 'supertest';
 import { App } from 'supertest/types';
 import { criarAppTeste } from './utils/criar-app-teste.util';
 import { limparBanco, prismaTeste } from './utils/prisma-test.util';
+import { corpoComo } from './utils/corpo.util';
+import { VooResponseDto } from '../src/modules/voos/dto/voo-response.dto';
+import { PaginaResultadoDto } from '../src/core/common/dto/pagina-resultado.dto';
 
 describe('Voos (e2e)', () => {
   let app: INestApplication<App>;
@@ -36,7 +39,7 @@ describe('Voos (e2e)', () => {
       .send(vooValido)
       .expect(201);
 
-    expect(resposta.body).toMatchObject({
+    expect(corpoComo<VooResponseDto>(resposta)).toMatchObject({
       numeroVoo: vooValido.numeroVoo,
       status: 'AGENDADO',
       assentosDisponiveis: 100,
@@ -44,7 +47,10 @@ describe('Voos (e2e)', () => {
   });
 
   it('deve rejeitar número de voo duplicado com 409', async () => {
-    await request(app.getHttpServer()).post('/api/voos').send(vooValido).expect(201);
+    await request(app.getHttpServer())
+      .post('/api/voos')
+      .send(vooValido)
+      .expect(201);
 
     await request(app.getHttpServer())
       .post('/api/voos')
@@ -60,27 +66,37 @@ describe('Voos (e2e)', () => {
         .expect(201);
     }
 
-    const resposta = await request(app.getHttpServer()).get('/api/voos?page=1&limit=2').expect(200);
+    const resposta = await request(app.getHttpServer())
+      .get('/api/voos?page=1&limit=2')
+      .expect(200);
+    const pagina = corpoComo<PaginaResultadoDto<VooResponseDto>>(resposta);
 
-    expect(resposta.body.data).toHaveLength(2);
-    expect(resposta.body.total).toBe(3);
-    expect(resposta.body.totalPages).toBe(2);
+    expect(pagina.data).toHaveLength(2);
+    expect(pagina.total).toBe(3);
+    expect(pagina.totalPages).toBe(2);
   });
 
   it('deve atualizar e deletar um voo (fluxo completo)', async () => {
-    const criado = await request(app.getHttpServer()).post('/api/voos').send(vooValido).expect(201);
-    const id = criado.body.id;
+    const criado = await request(app.getHttpServer())
+      .post('/api/voos')
+      .send(vooValido)
+      .expect(201);
+    const { id } = corpoComo<VooResponseDto>(criado);
 
     await request(app.getHttpServer())
       .put(`/api/voos/${id}`)
       .send({ preco: 599.9 })
       .expect(200)
-      .expect(res => expect(res.body.preco).toBe(599.9));
+      .expect((res) =>
+        expect(corpoComo<VooResponseDto>(res).preco).toBe(599.9),
+      );
 
     await request(app.getHttpServer())
       .delete(`/api/voos/${id}`)
       .expect(200)
-      .expect(res => expect(res.body.success).toBe(true));
+      .expect((res) =>
+        expect(corpoComo<{ success: boolean }>(res).success).toBe(true),
+      );
 
     await request(app.getHttpServer()).get(`/api/voos/${id}`).expect(404);
   });
@@ -95,12 +111,13 @@ describe('Voos (e2e)', () => {
         dataChegada: '2020-01-01T12:00:00.000Z',
       })
       .expect(201);
+    const { id } = corpoComo<VooResponseDto>(criado);
 
     const resposta = await request(app.getHttpServer())
-      .get(`/api/voos/${criado.body.id}`)
+      .get(`/api/voos/${id}`)
       .expect(200);
 
-    expect(resposta.body.status).toBe('CONCLUIDO');
+    expect(corpoComo<VooResponseDto>(resposta).status).toBe('CONCLUIDO');
   });
 
   it('deve retornar 404 ao buscar um voo inexistente', async () => {

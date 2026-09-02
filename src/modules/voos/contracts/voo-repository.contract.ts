@@ -18,15 +18,18 @@ export interface VooRepositoryContract {
     data: VooEntity[];
     total: number;
   }>;
-  update(id: number, data: {
-    numeroVoo?: string;
-    origem?: string;
-    destino?: string;
-    dataPartida?: Date;
-    dataChegada?: Date;
-    assentosDisponiveis?: number;
-    preco?: number;
-    status?: string;
-  }): Promise<VooEntity>;
+  update(
+    id: number,
+    data: {
+      numeroVoo?: string;
+      origem?: string;
+      destino?: string;
+      dataPartida?: Date;
+      dataChegada?: Date;
+      assentosDisponiveis?: number;
+      preco?: number;
+      status?: string;
+    },
+  ): Promise<VooEntity>;
   delete(id: number): Promise<boolean>;
 }

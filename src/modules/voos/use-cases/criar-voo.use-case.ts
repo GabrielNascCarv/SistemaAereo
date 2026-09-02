@@ -17,7 +17,9 @@ export class CriarVooUseCase implements CriarVooUseCaseContract {
     status?: string;
   }) {
     // Verificar se número do voo já existe
-    const vooExistente = await this.vooRepository.findByNumeroVoo(data.numeroVoo);
+    const vooExistente = await this.vooRepository.findByNumeroVoo(
+      data.numeroVoo,
+    );
     if (vooExistente) {
       throw new ConflictException('Número do voo já cadastrado');
     }

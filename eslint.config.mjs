@@ -32,4 +32,12 @@ export default tseslint.config(
       "prettier/prettier": ["error", { endOfLine: "auto" }],
     },
   },
+  {
+    files: ['**/*.spec.ts', '**/*.e2e-spec.ts'],
+    rules: {
+      // jest.Mocked<T> aciona falso positivo nessa regra ao chamar
+      // `repo.metodo.mockResolvedValue(...)` — padrão normal em mocks do Jest.
+      '@typescript-eslint/unbound-method': 'off',
+    },
+  },
 );

@@ -15,9 +15,12 @@ export interface ReservaRepositoryContract {
     data: ReservaEntity[];
     total: number;
   }>;
-  update(id: number, data: {
-    status?: string;
-    numeroPassageiros?: number;
-  }): Promise<ReservaEntity>;
+  update(
+    id: number,
+    data: {
+      status?: string;
+      numeroPassageiros?: number;
+    },
+  ): Promise<ReservaEntity>;
   delete(id: number): Promise<boolean>;
 }

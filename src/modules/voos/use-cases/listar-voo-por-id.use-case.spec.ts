@@ -6,7 +6,9 @@ describe('ListarVooPorIdUseCase', () => {
   let useCase: ListarVooPorIdUseCase;
   let vooRepository: jest.Mocked<VooRepository>;
 
-  const criarVoo = (overrides: Partial<Parameters<typeof VooEntity.create>[0]> = {}) =>
+  const criarVoo = (
+    overrides: Partial<Parameters<typeof VooEntity.create>[0]> = {},
+  ) =>
     VooEntity.create({
       id: 1,
       numeroVoo: 'AB123',
@@ -62,12 +64,17 @@ describe('ListarVooPorIdUseCase', () => {
 
     const resultado = await useCase.execute(1);
 
-    expect(vooRepository.update).toHaveBeenCalledWith(1, { status: 'CONCLUIDO' });
+    expect(vooRepository.update).toHaveBeenCalledWith(1, {
+      status: 'CONCLUIDO',
+    });
     expect(resultado).toBe(vooConcluido);
   });
 
   it('não deve concluir automaticamente um voo já CANCELADO', async () => {
-    const voo = criarVoo({ status: 'CANCELADO', dataChegada: new Date('2020-01-01T11:00:00.000Z') });
+    const voo = criarVoo({
+      status: 'CANCELADO',
+      dataChegada: new Date('2020-01-01T11:00:00.000Z'),
+    });
     vooRepository.findById.mockResolvedValue(voo);
 
     const resultado = await useCase.execute(1);

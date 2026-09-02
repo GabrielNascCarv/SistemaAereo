@@ -3,6 +3,9 @@ import request from 'supertest';
 import { App } from 'supertest/types';
 import { criarAppTeste } from './utils/criar-app-teste.util';
 import { limparBanco, prismaTeste } from './utils/prisma-test.util';
+import { corpoComo } from './utils/corpo.util';
+import { PassageiroResponseDto } from '../src/modules/passageiros/dto/passageiro-response.dto';
+import { PaginaResultadoDto } from '../src/core/common/dto/pagina-resultado.dto';
 
 describe('Passageiros (e2e)', () => {
   let app: INestApplication<App>;
@@ -33,12 +36,14 @@ describe('Passageiros (e2e)', () => {
       .send(passageiroValido)
       .expect(201);
 
-    expect(resposta.body).toMatchObject({
+    const passageiro = corpoComo<PassageiroResponseDto>(resposta);
+
+    expect(passageiro).toMatchObject({
       nome: passageiroValido.nome,
       email: passageiroValido.email,
       cpf: passageiroValido.cpf,
     });
-    expect(resposta.body.id).toBeDefined();
+    expect(passageiro.id).toBeDefined();
   });
 
   it('deve rejeitar payload inválido com 400', async () => {
@@ -49,7 +54,10 @@ describe('Passageiros (e2e)', () => {
   });
 
   it('deve rejeitar email duplicado com 409', async () => {
-    await request(app.getHttpServer()).post('/api/passageiros').send(passageiroValido).expect(201);
+    await request(app.getHttpServer())
+      .post('/api/passageiros')
+      .send(passageiroValido)
+      .expect(201);
 
     await request(app.getHttpServer())
       .post('/api/passageiros')
@@ -73,11 +81,14 @@ describe('Passageiros (e2e)', () => {
       .get('/api/passageiros?page=1&limit=2')
       .expect(200);
 
-    expect(resposta.body.data).toHaveLength(2);
-    expect(resposta.body.total).toBe(3);
-    expect(resposta.body.page).toBe(1);
-    expect(resposta.body.limit).toBe(2);
-    expect(resposta.body.totalPages).toBe(2);
+    const pagina =
+      corpoComo<PaginaResultadoDto<PassageiroResponseDto>>(resposta);
+
+    expect(pagina.data).toHaveLength(2);
+    expect(pagina.total).toBe(3);
+    expect(pagina.page).toBe(1);
+    expect(pagina.limit).toBe(2);
+    expect(pagina.totalPages).toBe(2);
   });
 
   it('deve buscar, atualizar e deletar um passageiro (fluxo completo)', async () => {
@@ -85,28 +96,40 @@ describe('Passageiros (e2e)', () => {
       .post('/api/passageiros')
       .send(passageiroValido)
       .expect(201);
-    const id = criado.body.id;
+    const { id } = corpoComo<PassageiroResponseDto>(criado);
 
     await request(app.getHttpServer())
       .get(`/api/passageiros/${id}`)
       .expect(200)
-      .expect(res => expect(res.body.email).toBe(passageiroValido.email));
+      .expect((res) =>
+        expect(corpoComo<PassageiroResponseDto>(res).email).toBe(
+          passageiroValido.email,
+        ),
+      );
 
     await request(app.getHttpServer())
       .put(`/api/passageiros/${id}`)
       .send({ nome: 'João Souza' })
       .expect(200)
-      .expect(res => expect(res.body.nome).toBe('João Souza'));
+      .expect((res) =>
+        expect(corpoComo<PassageiroResponseDto>(res).nome).toBe('João Souza'),
+      );
 
     await request(app.getHttpServer())
       .delete(`/api/passageiros/${id}`)
       .expect(200)
-      .expect(res => expect(res.body.success).toBe(true));
+      .expect((res) =>
+        expect(corpoComo<{ success: boolean }>(res).success).toBe(true),
+      );
 
-    await request(app.getHttpServer()).get(`/api/passageiros/${id}`).expect(404);
+    await request(app.getHttpServer())
+      .get(`/api/passageiros/${id}`)
+      .expect(404);
   });
 
   it('deve retornar 404 ao buscar um passageiro inexistente', async () => {
-    await request(app.getHttpServer()).get('/api/passageiros/999999').expect(404);
+    await request(app.getHttpServer())
+      .get('/api/passageiros/999999')
+      .expect(404);
   });
 });

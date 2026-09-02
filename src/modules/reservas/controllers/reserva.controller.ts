@@ -1,4 +1,17 @@
-import { Controller, Post, Body, HttpCode, HttpStatus, Get, Param, ParseIntPipe, NotFoundException, Put, Delete, Query } from '@nestjs/common';
+import {
+  Controller,
+  Post,
+  Body,
+  HttpCode,
+  HttpStatus,
+  Get,
+  Param,
+  ParseIntPipe,
+  NotFoundException,
+  Put,
+  Delete,
+  Query,
+} from '@nestjs/common';
 import { CriarReservaUseCase } from '../use-cases/criar-reserva.use-case';
 import { ListarReservasUseCase } from '../use-cases/listar-reservas.use-case';
 import { ListarReservaPorIdUseCase } from '../use-cases/listar-reserva-por-id.use-case';
@@ -38,26 +51,36 @@ export class ReservaController {
   }
 
   @Get()
-  async listar(@Query() query: PaginacaoQueryDto): Promise<PaginaResultadoDto<ReservaResponseDto>> {
+  async listar(
+    @Query() query: PaginacaoQueryDto,
+  ): Promise<PaginaResultadoDto<ReservaResponseDto>> {
     const { page = 1, limit = 15 } = query;
-    const { data, total } = await this.listarReservasUseCase.execute({ page, limit });
+    const { data, total } = await this.listarReservasUseCase.execute({
+      page,
+      limit,
+    });
 
-    const reservas = data.map(reserva => new ReservaResponseDto({
-      id: reserva.id,
-      codigoReserva: reserva.codigoReserva,
-      dataReserva: reserva.dataReserva,
-      status: reserva.status,
-      numeroPassageiros: reserva.numeroPassageiros,
-      vooId: reserva.vooId,
-      passageiroId: reserva.passageiroId,
-      createdAt: reserva.createdAt,
-    }));
+    const reservas = data.map(
+      (reserva) =>
+        new ReservaResponseDto({
+          id: reserva.id,
+          codigoReserva: reserva.codigoReserva,
+          dataReserva: reserva.dataReserva,
+          status: reserva.status,
+          numeroPassageiros: reserva.numeroPassageiros,
+          vooId: reserva.vooId,
+          passageiroId: reserva.passageiroId,
+          createdAt: reserva.createdAt,
+        }),
+    );
 
     return new PaginaResultadoDto(reservas, total, page, limit);
   }
 
   @Get(':id')
-  async listarPorId(@Param('id', ParseIntPipe) id: number): Promise<ReservaResponseDto> {
+  async listarPorId(
+    @Param('id', ParseIntPipe) id: number,
+  ): Promise<ReservaResponseDto> {
     const reserva = await this.listarReservaPorIdUseCase.execute(id);
 
     if (!reserva) {
@@ -96,12 +119,16 @@ export class ReservaController {
   }
 
   @Delete(':id')
-  async deletar(@Param('id', ParseIntPipe) id: number): Promise<{ success: boolean; message: string }> {
+  async deletar(
+    @Param('id', ParseIntPipe) id: number,
+  ): Promise<{ success: boolean; message: string }> {
     const success = await this.deletarReservaUseCase.execute(id);
 
     return {
       success,
-      message: success ? 'Reserva deletada com sucesso' : 'Erro ao deletar reserva',
+      message: success
+        ? 'Reserva deletada com sucesso'
+        : 'Erro ao deletar reserva',
     };
   }
 }

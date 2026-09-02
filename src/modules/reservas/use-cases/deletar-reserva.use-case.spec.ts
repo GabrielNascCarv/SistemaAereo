@@ -10,7 +10,9 @@ describe('DeletarReservaUseCase', () => {
   let reservaRepository: jest.Mocked<ReservaRepository>;
   let vooRepository: jest.Mocked<VooRepository>;
 
-  const criarReserva = (overrides: Partial<Parameters<typeof ReservaEntity.create>[0]> = {}) =>
+  const criarReserva = (
+    overrides: Partial<Parameters<typeof ReservaEntity.create>[0]> = {},
+  ) =>
     ReservaEntity.create({
       id: 1,
       codigoReserva: 'RES-XXXX-YYYY',
@@ -68,18 +70,24 @@ describe('DeletarReservaUseCase', () => {
   });
 
   it('deve restaurar os assentos do voo ao deletar uma reserva confirmada', async () => {
-    reservaRepository.findById.mockResolvedValue(criarReserva({ numeroPassageiros: 2 }));
+    reservaRepository.findById.mockResolvedValue(
+      criarReserva({ numeroPassageiros: 2 }),
+    );
     reservaRepository.delete.mockResolvedValue(true);
     vooRepository.findById.mockResolvedValue(voo);
 
     const resultado = await useCase.execute(1);
 
-    expect(vooRepository.update).toHaveBeenCalledWith(1, { assentosDisponiveis: 100 });
+    expect(vooRepository.update).toHaveBeenCalledWith(1, {
+      assentosDisponiveis: 100,
+    });
     expect(resultado).toBe(true);
   });
 
   it('não deve alterar assentos ao deletar uma reserva já cancelada', async () => {
-    reservaRepository.findById.mockResolvedValue(criarReserva({ status: 'CANCELADA' }));
+    reservaRepository.findById.mockResolvedValue(
+      criarReserva({ status: 'CANCELADA' }),
+    );
     reservaRepository.delete.mockResolvedValue(true);
 
     await useCase.execute(1);

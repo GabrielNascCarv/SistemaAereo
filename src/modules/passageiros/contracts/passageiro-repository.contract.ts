@@ -15,11 +15,14 @@ export interface PassageiroRepositoryContract {
     data: PassageiroEntity[];
     total: number;
   }>;
-  update(id: number, data: {
-    nome?: string;
-    email?: string;
-    cpf?: string;
-    telefone?: string;
-  }): Promise<PassageiroEntity>;
+  update(
+    id: number,
+    data: {
+      nome?: string;
+      email?: string;
+      cpf?: string;
+      telefone?: string;
+    },
+  ): Promise<PassageiroEntity>;
   delete(id: number): Promise<boolean>;
 }

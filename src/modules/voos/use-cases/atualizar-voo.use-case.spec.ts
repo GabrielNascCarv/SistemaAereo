@@ -37,7 +37,9 @@ describe('AtualizarVooUseCase', () => {
   it('deve lançar NotFoundException quando o voo não existe', async () => {
     vooRepository.findById.mockResolvedValue(null);
 
-    await expect(useCase.execute(1, { preco: 599.9 })).rejects.toThrow(NotFoundException);
+    await expect(useCase.execute(1, { preco: 599.9 })).rejects.toThrow(
+      NotFoundException,
+    );
     expect(vooRepository.update).not.toHaveBeenCalled();
   });
 
@@ -57,7 +59,9 @@ describe('AtualizarVooUseCase', () => {
       VooEntity.create({ ...vooExistente, id: 2, numeroVoo: 'CD456' }),
     );
 
-    await expect(useCase.execute(1, { numeroVoo: 'CD456' })).rejects.toThrow(ConflictException);
+    await expect(useCase.execute(1, { numeroVoo: 'CD456' })).rejects.toThrow(
+      ConflictException,
+    );
     expect(vooRepository.update).not.toHaveBeenCalled();
   });
 });

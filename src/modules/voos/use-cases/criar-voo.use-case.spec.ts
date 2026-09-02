@@ -44,7 +44,9 @@ describe('CriarVooUseCase', () => {
 
     const resultado = await useCase.execute(dadosValidos);
 
-    expect(vooRepository.findByNumeroVoo).toHaveBeenCalledWith(dadosValidos.numeroVoo);
+    expect(vooRepository.findByNumeroVoo).toHaveBeenCalledWith(
+      dadosValidos.numeroVoo,
+    );
     expect(vooRepository.create).toHaveBeenCalledWith(dadosValidos);
     expect(resultado).toBe(vooCriado);
   });
@@ -52,7 +54,9 @@ describe('CriarVooUseCase', () => {
   it('deve lançar ConflictException quando o número do voo já está cadastrado', async () => {
     vooRepository.findByNumeroVoo.mockResolvedValue(vooCriado);
 
-    await expect(useCase.execute(dadosValidos)).rejects.toThrow(ConflictException);
+    await expect(useCase.execute(dadosValidos)).rejects.toThrow(
+      ConflictException,
+    );
     expect(vooRepository.create).not.toHaveBeenCalled();
   });
 });

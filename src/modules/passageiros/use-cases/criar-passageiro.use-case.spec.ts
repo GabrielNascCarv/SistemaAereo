@@ -42,8 +42,12 @@ describe('CriarPassageiroUseCase', () => {
 
     const resultado = await useCase.execute(dadosValidos);
 
-    expect(passageiroRepository.findByEmail).toHaveBeenCalledWith(dadosValidos.email);
-    expect(passageiroRepository.findByCpf).toHaveBeenCalledWith(dadosValidos.cpf);
+    expect(passageiroRepository.findByEmail).toHaveBeenCalledWith(
+      dadosValidos.email,
+    );
+    expect(passageiroRepository.findByCpf).toHaveBeenCalledWith(
+      dadosValidos.cpf,
+    );
     expect(passageiroRepository.create).toHaveBeenCalledWith(dadosValidos);
     expect(resultado).toBe(passageiroCriado);
   });
@@ -51,7 +55,9 @@ describe('CriarPassageiroUseCase', () => {
   it('deve lançar ConflictException quando o email já está cadastrado', async () => {
     passageiroRepository.findByEmail.mockResolvedValue(passageiroCriado);
 
-    await expect(useCase.execute(dadosValidos)).rejects.toThrow(ConflictException);
+    await expect(useCase.execute(dadosValidos)).rejects.toThrow(
+      ConflictException,
+    );
     expect(passageiroRepository.findByCpf).not.toHaveBeenCalled();
     expect(passageiroRepository.create).not.toHaveBeenCalled();
   });
@@ -60,7 +66,9 @@ describe('CriarPassageiroUseCase', () => {
     passageiroRepository.findByEmail.mockResolvedValue(null);
     passageiroRepository.findByCpf.mockResolvedValue(passageiroCriado);
 
-    await expect(useCase.execute(dadosValidos)).rejects.toThrow(ConflictException);
+    await expect(useCase.execute(dadosValidos)).rejects.toThrow(
+      ConflictException,
+    );
     expect(passageiroRepository.create).not.toHaveBeenCalled();
   });
 });

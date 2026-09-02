@@ -9,10 +9,13 @@ export class ListarVoosUseCase implements ListarVoosUseCaseContract {
 
   async execute(params: { page: number; limit: number }) {
     const skip = (params.page - 1) * params.limit;
-    const { data, total } = await this.vooRepository.findAll({ skip, take: params.limit });
+    const { data, total } = await this.vooRepository.findAll({
+      skip,
+      take: params.limit,
+    });
 
     const voos = await Promise.all(
-      data.map(voo =>
+      data.map((voo) =>
         vooDeveSerConcluido(voo)
           ? this.vooRepository.update(voo.id, { status: 'CONCLUIDO' })
           : Promise.resolve(voo),

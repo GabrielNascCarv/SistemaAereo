@@ -3,6 +3,11 @@ import request from 'supertest';
 import { App } from 'supertest/types';
 import { criarAppTeste } from './utils/criar-app-teste.util';
 import { limparBanco, prismaTeste } from './utils/prisma-test.util';
+import { corpoComo } from './utils/corpo.util';
+import { ReservaResponseDto } from '../src/modules/reservas/dto/reserva-response.dto';
+import { VooResponseDto } from '../src/modules/voos/dto/voo-response.dto';
+import { PassageiroResponseDto } from '../src/modules/passageiros/dto/passageiro-response.dto';
+import { PaginaResultadoDto } from '../src/core/common/dto/pagina-resultado.dto';
 
 describe('Reservas (e2e)', () => {
   let app: INestApplication<App>;
@@ -24,20 +29,22 @@ describe('Reservas (e2e)', () => {
     preco: 499.9,
   };
 
-  async function criarPassageiro() {
+  async function criarPassageiro(): Promise<number> {
     const resposta = await request(app.getHttpServer())
       .post('/api/passageiros')
       .send(passageiroValido)
       .expect(201);
-    return resposta.body.id as number;
+    return corpoComo<PassageiroResponseDto>(resposta).id;
   }
 
-  async function criarVoo(overrides: Partial<typeof vooValido> = {}) {
+  async function criarVoo(
+    overrides: Partial<typeof vooValido> = {},
+  ): Promise<number> {
     const resposta = await request(app.getHttpServer())
       .post('/api/voos')
       .send({ ...vooValido, ...overrides })
       .expect(201);
-    return resposta.body.id as number;
+    return corpoComo<VooResponseDto>(resposta).id;
   }
 
   beforeAll(async () => {
@@ -57,21 +64,24 @@ describe('Reservas (e2e)', () => {
     const passageiroId = await criarPassageiro();
     const vooId = await criarVoo();
 
-    const reserva = await request(app.getHttpServer())
+    const resposta = await request(app.getHttpServer())
       .post('/api/reservas')
       .send({ vooId, passageiroId, numeroPassageiros: 2 })
       .expect(201);
+    const reserva = corpoComo<ReservaResponseDto>(resposta);
 
-    expect(reserva.body).toMatchObject({
+    expect(reserva).toMatchObject({
       status: 'CONFIRMADA',
       numeroPassageiros: 2,
       vooId,
       passageiroId,
     });
-    expect(reserva.body.codigoReserva).toMatch(/^RES-/);
+    expect(reserva.codigoReserva).toMatch(/^RES-/);
 
-    const voo = await request(app.getHttpServer()).get(`/api/voos/${vooId}`).expect(200);
-    expect(voo.body.assentosDisponiveis).toBe(98);
+    const vooResposta = await request(app.getHttpServer())
+      .get(`/api/voos/${vooId}`)
+      .expect(200);
+    expect(corpoComo<VooResponseDto>(vooResposta).assentosDisponiveis).toBe(98);
   });
 
   it('deve retornar 404 ao reservar em um voo inexistente', async () => {
@@ -121,39 +131,53 @@ describe('Reservas (e2e)', () => {
     const passageiroId = await criarPassageiro();
     const vooId = await criarVoo();
 
-    const reserva = await request(app.getHttpServer())
+    const criada = await request(app.getHttpServer())
       .post('/api/reservas')
       .send({ vooId, passageiroId, numeroPassageiros: 3 })
       .expect(201);
+    const { id } = corpoComo<ReservaResponseDto>(criada);
 
     await request(app.getHttpServer())
-      .put(`/api/reservas/${reserva.body.id}`)
+      .put(`/api/reservas/${id}`)
       .send({ status: 'CANCELADA' })
       .expect(200)
-      .expect(res => expect(res.body.status).toBe('CANCELADA'));
+      .expect((res) =>
+        expect(corpoComo<ReservaResponseDto>(res).status).toBe('CANCELADA'),
+      );
 
-    const voo = await request(app.getHttpServer()).get(`/api/voos/${vooId}`).expect(200);
-    expect(voo.body.assentosDisponiveis).toBe(100);
+    const vooResposta = await request(app.getHttpServer())
+      .get(`/api/voos/${vooId}`)
+      .expect(200);
+    expect(corpoComo<VooResponseDto>(vooResposta).assentosDisponiveis).toBe(
+      100,
+    );
   });
 
   it('deve deletar uma reserva confirmada e restaurar os assentos do voo', async () => {
     const passageiroId = await criarPassageiro();
     const vooId = await criarVoo();
 
-    const reserva = await request(app.getHttpServer())
+    const criada = await request(app.getHttpServer())
       .post('/api/reservas')
       .send({ vooId, passageiroId, numeroPassageiros: 5 })
       .expect(201);
+    const { id } = corpoComo<ReservaResponseDto>(criada);
 
     await request(app.getHttpServer())
-      .delete(`/api/reservas/${reserva.body.id}`)
+      .delete(`/api/reservas/${id}`)
       .expect(200)
-      .expect(res => expect(res.body.success).toBe(true));
+      .expect((res) =>
+        expect(corpoComo<{ success: boolean }>(res).success).toBe(true),
+      );
 
-    const voo = await request(app.getHttpServer()).get(`/api/voos/${vooId}`).expect(200);
-    expect(voo.body.assentosDisponiveis).toBe(100);
+    const vooResposta = await request(app.getHttpServer())
+      .get(`/api/voos/${vooId}`)
+      .expect(200);
+    expect(corpoComo<VooResponseDto>(vooResposta).assentosDisponiveis).toBe(
+      100,
+    );
 
-    await request(app.getHttpServer()).get(`/api/reservas/${reserva.body.id}`).expect(404);
+    await request(app.getHttpServer()).get(`/api/reservas/${id}`).expect(404);
   });
 
   it('deve listar reservas de forma paginada', async () => {
@@ -170,9 +194,10 @@ describe('Reservas (e2e)', () => {
     const resposta = await request(app.getHttpServer())
       .get('/api/reservas?page=1&limit=2')
       .expect(200);
+    const pagina = corpoComo<PaginaResultadoDto<ReservaResponseDto>>(resposta);
 
-    expect(resposta.body.data).toHaveLength(2);
-    expect(resposta.body.total).toBe(3);
-    expect(resposta.body.totalPages).toBe(2);
+    expect(pagina.data).toHaveLength(2);
+    expect(pagina.total).toBe(3);
+    expect(pagina.totalPages).toBe(2);
   });
 });

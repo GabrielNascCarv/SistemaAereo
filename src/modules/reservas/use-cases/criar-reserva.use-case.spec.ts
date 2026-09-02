@@ -13,7 +13,9 @@ describe('CriarReservaUseCase', () => {
   let vooRepository: jest.Mocked<VooRepository>;
   let passageiroRepository: jest.Mocked<PassageiroRepository>;
 
-  const criarVoo = (overrides: Partial<Parameters<typeof VooEntity.create>[0]> = {}) =>
+  const criarVoo = (
+    overrides: Partial<Parameters<typeof VooEntity.create>[0]> = {},
+  ) =>
     VooEntity.create({
       id: 1,
       numeroVoo: 'AB123',
@@ -80,7 +82,11 @@ describe('CriarReservaUseCase', () => {
       delete: jest.fn(),
     } as unknown as jest.Mocked<PassageiroRepository>;
 
-    useCase = new CriarReservaUseCase(reservaRepository, vooRepository, passageiroRepository);
+    useCase = new CriarReservaUseCase(
+      reservaRepository,
+      vooRepository,
+      passageiroRepository,
+    );
   });
 
   const dadosValidos = { vooId: 1, passageiroId: 1, numeroPassageiros: 2 };
@@ -88,16 +94,20 @@ describe('CriarReservaUseCase', () => {
   it('deve lançar NotFoundException quando o voo não existe', async () => {
     vooRepository.findById.mockResolvedValue(null);
 
-    await expect(useCase.execute(dadosValidos)).rejects.toThrow(NotFoundException);
+    await expect(useCase.execute(dadosValidos)).rejects.toThrow(
+      NotFoundException,
+    );
     expect(reservaRepository.create).not.toHaveBeenCalled();
   });
 
   it.each(['CANCELADO', 'CONCLUIDO'])(
     'deve lançar BadRequestException quando o voo está %s',
-    async status => {
+    async (status) => {
       vooRepository.findById.mockResolvedValue(criarVoo({ status }));
 
-      await expect(useCase.execute(dadosValidos)).rejects.toThrow(BadRequestException);
+      await expect(useCase.execute(dadosValidos)).rejects.toThrow(
+        BadRequestException,
+      );
       expect(reservaRepository.create).not.toHaveBeenCalled();
     },
   );
@@ -106,15 +116,21 @@ describe('CriarReservaUseCase', () => {
     vooRepository.findById.mockResolvedValue(criarVoo());
     passageiroRepository.findById.mockResolvedValue(null);
 
-    await expect(useCase.execute(dadosValidos)).rejects.toThrow(NotFoundException);
+    await expect(useCase.execute(dadosValidos)).rejects.toThrow(
+      NotFoundException,
+    );
     expect(reservaRepository.create).not.toHaveBeenCalled();
   });
 
   it('deve lançar BadRequestException quando não há assentos suficientes', async () => {
-    vooRepository.findById.mockResolvedValue(criarVoo({ assentosDisponiveis: 1 }));
+    vooRepository.findById.mockResolvedValue(
+      criarVoo({ assentosDisponiveis: 1 }),
+    );
     passageiroRepository.findById.mockResolvedValue(passageiro);
 
-    await expect(useCase.execute(dadosValidos)).rejects.toThrow(BadRequestException);
+    await expect(useCase.execute(dadosValidos)).rejects.toThrow(
+      BadRequestException,
+    );
     expect(reservaRepository.create).not.toHaveBeenCalled();
   });
 
@@ -129,13 +145,16 @@ describe('CriarReservaUseCase', () => {
 
     expect(reservaRepository.create).toHaveBeenCalledWith(
       expect.objectContaining({
+        // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment -- matcher do Jest é tipado como `any`
         codigoReserva: expect.stringMatching(/^RES-/),
         numeroPassageiros: 2,
         vooId: 1,
         passageiroId: 1,
       }),
     );
-    expect(vooRepository.update).toHaveBeenCalledWith(voo.id, { assentosDisponiveis: 98 });
+    expect(vooRepository.update).toHaveBeenCalledWith(voo.id, {
+      assentosDisponiveis: 98,
+    });
     expect(resultado).toBe(reservaCriada);
   });
 });

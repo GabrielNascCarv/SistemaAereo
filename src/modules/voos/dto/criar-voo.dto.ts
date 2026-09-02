@@ -1,4 +1,13 @@
-import { IsString, IsNotEmpty, IsInt, IsPositive, IsDateString, IsOptional, MaxLength, Min } from 'class-validator';
+import {
+  IsString,
+  IsNotEmpty,
+  IsInt,
+  IsPositive,
+  IsDateString,
+  IsOptional,
+  MaxLength,
+  Min,
+} from 'class-validator';
 
 export class CriarVooDto {
   @IsString({ message: 'Número do voo deve ser uma string' })

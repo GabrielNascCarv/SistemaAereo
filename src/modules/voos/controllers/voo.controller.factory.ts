@@ -22,6 +22,12 @@ export class VooControllerFactory {
     const listarVooPorIdUseCase = this.listarVooPorIdUseCaseFactory.create();
     const atualizarVooUseCase = this.atualizarVooUseCaseFactory.create();
     const deletarVooUseCase = this.deletarVooUseCaseFactory.create();
-    return new VooController(criarVooUseCase, listarVoosUseCase, listarVooPorIdUseCase, atualizarVooUseCase, deletarVooUseCase);
+    return new VooController(
+      criarVooUseCase,
+      listarVoosUseCase,
+      listarVooPorIdUseCase,
+      atualizarVooUseCase,
+      deletarVooUseCase,
+    );
   }
 }

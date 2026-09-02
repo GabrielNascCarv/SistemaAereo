@@ -58,17 +58,22 @@ export class PassageiroRepository implements PassageiroRepositoryContract {
     ]);
 
     return {
-      data: passageiros.map(passageiro => PassageiroEntity.create(passageiro)),
+      data: passageiros.map((passageiro) =>
+        PassageiroEntity.create(passageiro),
+      ),
       total,
     };
   }
 
-  async update(id: number, data: {
-    nome?: string;
-    email?: string;
-    cpf?: string;
-    telefone?: string;
-  }): Promise<PassageiroEntity> {
+  async update(
+    id: number,
+    data: {
+      nome?: string;
+      email?: string;
+      cpf?: string;
+      telefone?: string;
+    },
+  ): Promise<PassageiroEntity> {
     const passageiro = await this.prisma.passageiro.update({
       where: { id },
       data,
@@ -83,9 +88,8 @@ export class PassageiroRepository implements PassageiroRepositoryContract {
         where: { id },
       });
       return true;
-    } catch (error) {
+    } catch {
       return false;
     }
   }
-
 }

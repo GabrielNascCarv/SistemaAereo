@@ -4,12 +4,9 @@ import { PassageiroRepository } from '../../repositories/passageiro.repository';
 
 @Injectable()
 export class ListarPassageiroPorIdUseCaseFactory {
-  constructor(
-    private readonly passageiroRepository: PassageiroRepository,
-  ) {}
+  constructor(private readonly passageiroRepository: PassageiroRepository) {}
 
   create(): ListarPassageiroPorIdUseCase {
     return new ListarPassageiroPorIdUseCase(this.passageiroRepository);
   }
 }
-

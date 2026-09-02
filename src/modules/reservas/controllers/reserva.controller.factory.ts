@@ -19,9 +19,17 @@ export class ReservaControllerFactory {
   create(): ReservaController {
     const criarReservaUseCase = this.criarReservaUseCaseFactory.create();
     const listarReservasUseCase = this.listarReservasUseCaseFactory.create();
-    const listarReservaPorIdUseCase = this.listarReservaPorIdUseCaseFactory.create();
-    const atualizarReservaUseCase = this.atualizarReservaUseCaseFactory.create();
+    const listarReservaPorIdUseCase =
+      this.listarReservaPorIdUseCaseFactory.create();
+    const atualizarReservaUseCase =
+      this.atualizarReservaUseCaseFactory.create();
     const deletarReservaUseCase = this.deletarReservaUseCaseFactory.create();
-    return new ReservaController(criarReservaUseCase, listarReservasUseCase, listarReservaPorIdUseCase, atualizarReservaUseCase, deletarReservaUseCase);
+    return new ReservaController(
+      criarReservaUseCase,
+      listarReservasUseCase,
+      listarReservaPorIdUseCase,
+      atualizarReservaUseCase,
+      deletarReservaUseCase,
+    );
   }
 }

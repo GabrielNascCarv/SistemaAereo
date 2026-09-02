@@ -11,6 +11,9 @@ export class DeletarReservaUseCaseFactory {
   ) {}
 
   create(): DeletarReservaUseCase {
-    return new DeletarReservaUseCase(this.reservaRepository, this.vooRepository);
+    return new DeletarReservaUseCase(
+      this.reservaRepository,
+      this.vooRepository,
+    );
   }
 }

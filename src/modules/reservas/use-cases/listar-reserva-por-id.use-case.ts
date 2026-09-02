@@ -3,7 +3,9 @@ import type { ListarReservaPorIdUseCaseContract } from '../contracts/listar-rese
 import { ReservaRepository } from '../repositories/reserva.repository';
 
 @Injectable()
-export class ListarReservaPorIdUseCase implements ListarReservaPorIdUseCaseContract {
+export class ListarReservaPorIdUseCase
+  implements ListarReservaPorIdUseCaseContract
+{
   constructor(private readonly reservaRepository: ReservaRepository) {}
 
   async execute(id: number) {

@@ -1,19 +1,28 @@
-import { Injectable, NotFoundException, BadRequestException } from '@nestjs/common';
+import {
+  Injectable,
+  NotFoundException,
+  BadRequestException,
+} from '@nestjs/common';
 import type { AtualizarReservaUseCaseContract } from '../contracts/atualizar-reserva-use-case.contract';
 import { ReservaRepository } from '../repositories/reserva.repository';
 import { VooRepository } from '../../voos/repositories/voo.repository';
 
 @Injectable()
-export class AtualizarReservaUseCase implements AtualizarReservaUseCaseContract {
+export class AtualizarReservaUseCase
+  implements AtualizarReservaUseCaseContract
+{
   constructor(
     private readonly reservaRepository: ReservaRepository,
     private readonly vooRepository: VooRepository,
   ) {}
 
-  async execute(id: number, data: {
-    status?: string;
-    numeroPassageiros?: number;
-  }) {
+  async execute(
+    id: number,
+    data: {
+      status?: string;
+      numeroPassageiros?: number;
+    },
+  ) {
     const reservaExistente = await this.reservaRepository.findById(id);
     if (!reservaExistente) {
       throw new NotFoundException('Reserva não encontrada');
@@ -30,15 +39,19 @@ export class AtualizarReservaUseCase implements AtualizarReservaUseCaseContract 
 
     if (data.status === 'CANCELADA') {
       await this.vooRepository.update(voo.id, {
-        assentosDisponiveis: voo.assentosDisponiveis + reservaExistente.numeroPassageiros,
+        assentosDisponiveis:
+          voo.assentosDisponiveis + reservaExistente.numeroPassageiros,
       });
     } else if (
       data.numeroPassageiros !== undefined &&
       data.numeroPassageiros !== reservaExistente.numeroPassageiros
     ) {
-      const diferenca = data.numeroPassageiros - reservaExistente.numeroPassageiros;
+      const diferenca =
+        data.numeroPassageiros - reservaExistente.numeroPassageiros;
       if (diferenca > voo.assentosDisponiveis) {
-        throw new BadRequestException('Assentos disponíveis insuficientes para este voo');
+        throw new BadRequestException(
+          'Assentos disponíveis insuficientes para este voo',
+        );
       }
       await this.vooRepository.update(voo.id, {
         assentosDisponiveis: voo.assentosDisponiveis - diferenca,

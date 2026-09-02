@@ -1,9 +1,11 @@
-import { Injectable, NotFoundException } from "@nestjs/common";
-import type { DeletarPassageiroUseCaseContract } from "../contracts/deletar-passageiro-use-case.contract";
-import { PassageiroRepository } from "../repositories/passageiro.repository";
+import { Injectable, NotFoundException } from '@nestjs/common';
+import type { DeletarPassageiroUseCaseContract } from '../contracts/deletar-passageiro-use-case.contract';
+import { PassageiroRepository } from '../repositories/passageiro.repository';
 
 @Injectable()
-export class DeletarPassageiroUseCase implements DeletarPassageiroUseCaseContract {
+export class DeletarPassageiroUseCase
+  implements DeletarPassageiroUseCaseContract
+{
   constructor(private readonly passageiroRepository: PassageiroRepository) {}
 
   async execute(id: number): Promise<boolean> {

@@ -21,7 +21,9 @@ export class ReservaRepository implements ReservaRepositoryContract {
     return ReservaEntity.create(reserva);
   }
 
-  async findByCodigoReserva(codigoReserva: string): Promise<ReservaEntity | null> {
+  async findByCodigoReserva(
+    codigoReserva: string,
+  ): Promise<ReservaEntity | null> {
     const reserva = await this.prisma.reserva.findUnique({
       where: { codigoReserva },
     });
@@ -51,15 +53,18 @@ export class ReservaRepository implements ReservaRepositoryContract {
     ]);
 
     return {
-      data: reservas.map(reserva => ReservaEntity.create(reserva)),
+      data: reservas.map((reserva) => ReservaEntity.create(reserva)),
       total,
     };
   }
 
-  async update(id: number, data: {
-    status?: string;
-    numeroPassageiros?: number;
-  }): Promise<ReservaEntity> {
+  async update(
+    id: number,
+    data: {
+      status?: string;
+      numeroPassageiros?: number;
+    },
+  ): Promise<ReservaEntity> {
     const reserva = await this.prisma.reserva.update({
       where: { id },
       data,
@@ -74,7 +79,7 @@ export class ReservaRepository implements ReservaRepositoryContract {
         where: { id },
       });
       return true;
-    } catch (error) {
+    } catch {
       return false;
     }
   }

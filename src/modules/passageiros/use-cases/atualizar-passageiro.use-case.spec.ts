@@ -34,7 +34,9 @@ describe('AtualizarPassageiroUseCase', () => {
   it('deve lançar NotFoundException quando o passageiro não existe', async () => {
     passageiroRepository.findById.mockResolvedValue(null);
 
-    await expect(useCase.execute(1, { nome: 'Novo Nome' })).rejects.toThrow(NotFoundException);
+    await expect(useCase.execute(1, { nome: 'Novo Nome' })).rejects.toThrow(
+      NotFoundException,
+    );
     expect(passageiroRepository.update).not.toHaveBeenCalled();
   });
 
@@ -46,7 +48,9 @@ describe('AtualizarPassageiroUseCase', () => {
 
     expect(passageiroRepository.findByEmail).not.toHaveBeenCalled();
     expect(passageiroRepository.findByCpf).not.toHaveBeenCalled();
-    expect(passageiroRepository.update).toHaveBeenCalledWith(1, { nome: 'Novo Nome' });
+    expect(passageiroRepository.update).toHaveBeenCalledWith(1, {
+      nome: 'Novo Nome',
+    });
   });
 
   it('deve lançar ConflictException quando o novo email já pertence a outro passageiro', async () => {
@@ -67,9 +71,9 @@ describe('AtualizarPassageiroUseCase', () => {
       PassageiroEntity.create({ ...passageiroExistente, id: 2 }),
     );
 
-    await expect(
-      useCase.execute(1, { cpf: '987.654.321-00' }),
-    ).rejects.toThrow(ConflictException);
+    await expect(useCase.execute(1, { cpf: '987.654.321-00' })).rejects.toThrow(
+      ConflictException,
+    );
     expect(passageiroRepository.update).not.toHaveBeenCalled();
   });
 });

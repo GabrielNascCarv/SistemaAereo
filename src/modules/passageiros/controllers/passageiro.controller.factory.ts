@@ -8,20 +8,30 @@ import { DeletarPassageiroUseCaseFactory } from '../use-cases/factory/deletar-pa
 
 @Injectable()
 export class PassageiroControllerFactory {
-    constructor(
-        private readonly criarPassageiroUseCaseFactory: CriarPassageiroUseCaseFactory,
-        private readonly listarPassageirosUseCaseFactory: ListarPassageirosUseCaseFactory,
-        private readonly listarPassageiroPorIdUseCaseFactory: ListarPassageiroPorIdUseCaseFactory,
-        private readonly atualizarPassageiroUseCaseFactory: AtualizarPassageiroUseCaseFactory,
-        private readonly deletarPassageiroUseCaseFactory: DeletarPassageiroUseCaseFactory,
-    ) {}
+  constructor(
+    private readonly criarPassageiroUseCaseFactory: CriarPassageiroUseCaseFactory,
+    private readonly listarPassageirosUseCaseFactory: ListarPassageirosUseCaseFactory,
+    private readonly listarPassageiroPorIdUseCaseFactory: ListarPassageiroPorIdUseCaseFactory,
+    private readonly atualizarPassageiroUseCaseFactory: AtualizarPassageiroUseCaseFactory,
+    private readonly deletarPassageiroUseCaseFactory: DeletarPassageiroUseCaseFactory,
+  ) {}
 
-    create(): PassageiroController {
-        const criarPassageiroUseCase = this.criarPassageiroUseCaseFactory.create();
-        const listarPassageirosUseCase = this.listarPassageirosUseCaseFactory.create();
-        const listarPassageiroPorIdUseCase = this.listarPassageiroPorIdUseCaseFactory.create();
-        const atualizarPassageiroUseCase = this.atualizarPassageiroUseCaseFactory.create();
-        const deletarPassageiroUseCase = this.deletarPassageiroUseCaseFactory.create();
-        return new PassageiroController(criarPassageiroUseCase, listarPassageirosUseCase, listarPassageiroPorIdUseCase, atualizarPassageiroUseCase, deletarPassageiroUseCase);
-    }
+  create(): PassageiroController {
+    const criarPassageiroUseCase = this.criarPassageiroUseCaseFactory.create();
+    const listarPassageirosUseCase =
+      this.listarPassageirosUseCaseFactory.create();
+    const listarPassageiroPorIdUseCase =
+      this.listarPassageiroPorIdUseCaseFactory.create();
+    const atualizarPassageiroUseCase =
+      this.atualizarPassageiroUseCaseFactory.create();
+    const deletarPassageiroUseCase =
+      this.deletarPassageiroUseCaseFactory.create();
+    return new PassageiroController(
+      criarPassageiroUseCase,
+      listarPassageirosUseCase,
+      listarPassageiroPorIdUseCase,
+      atualizarPassageiroUseCase,
+      deletarPassageiroUseCase,
+    );
+  }
 }

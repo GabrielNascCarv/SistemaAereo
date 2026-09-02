@@ -54,21 +54,24 @@ export class VooRepository implements VooRepositoryContract {
     ]);
 
     return {
-      data: voos.map(voo => VooEntity.create(voo)),
+      data: voos.map((voo) => VooEntity.create(voo)),
       total,
     };
   }
 
-  async update(id: number, data: {
-    numeroVoo?: string;
-    origem?: string;
-    destino?: string;
-    dataPartida?: Date;
-    dataChegada?: Date;
-    assentosDisponiveis?: number;
-    preco?: number;
-    status?: string;
-  }): Promise<VooEntity> {
+  async update(
+    id: number,
+    data: {
+      numeroVoo?: string;
+      origem?: string;
+      destino?: string;
+      dataPartida?: Date;
+      dataChegada?: Date;
+      assentosDisponiveis?: number;
+      preco?: number;
+      status?: string;
+    },
+  ): Promise<VooEntity> {
     const voo = await this.prisma.voo.update({
       where: { id },
       data,
@@ -83,7 +86,7 @@ export class VooRepository implements VooRepositoryContract {
         where: { id },
       });
       return true;
-    } catch (error) {
+    } catch {
       return false;
     }
   }

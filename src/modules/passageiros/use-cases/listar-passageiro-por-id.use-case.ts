@@ -3,13 +3,12 @@ import type { ListarPassageiroPorIdUseCaseContract } from '../contracts/listar-p
 import { PassageiroRepository } from '../repositories/passageiro.repository';
 
 @Injectable()
-export class ListarPassageiroPorIdUseCase implements ListarPassageiroPorIdUseCaseContract {
-  constructor(
-    private readonly passageiroRepository: PassageiroRepository,
-  ) {}
+export class ListarPassageiroPorIdUseCase
+  implements ListarPassageiroPorIdUseCaseContract
+{
+  constructor(private readonly passageiroRepository: PassageiroRepository) {}
 
   async execute(id: number) {
     return await this.passageiroRepository.findById(id);
   }
 }
-

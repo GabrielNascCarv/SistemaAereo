@@ -11,6 +11,9 @@ export class AtualizarReservaUseCaseFactory {
   ) {}
 
   create(): AtualizarReservaUseCase {
-    return new AtualizarReservaUseCase(this.reservaRepository, this.vooRepository);
+    return new AtualizarReservaUseCase(
+      this.reservaRepository,
+      this.vooRepository,
+    );
   }
 }

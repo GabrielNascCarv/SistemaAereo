@@ -1,4 +1,12 @@
-import { IsString, IsInt, IsPositive, IsDateString, IsOptional, MaxLength, Min } from 'class-validator';
+import {
+  IsString,
+  IsInt,
+  IsPositive,
+  IsDateString,
+  IsOptional,
+  MaxLength,
+  Min,
+} from 'class-validator';
 
 export class AtualizarVooDto {
   @IsOptional()
