@@ -41,15 +41,21 @@ export class ImportarVooExternoUseCase {
       for (let indice = 0; indice < slice.segmentos.length; indice++) {
         const segmento = slice.segmentos[indice];
 
-        // Idempotente: se esse voo (mesmo número) já foi importado por uma
-        // busca anterior, reaproveita o registro em vez de duplicar.
+        const dataPartida = new Date(segmento.dataPartida);
+
+        // Idempotente por número + data de partida: o mesmo número de voo
+        // pode aparecer em datas diferentes (ou até no trecho de volta, no
+        // sandbox da Duffel) — sem a data, reaproveitaríamos o voo errado.
         const voo =
-          (await this.vooRepository.findByNumeroVoo(segmento.numeroVoo)) ??
+          (await this.vooRepository.findByNumeroVoo(
+            segmento.numeroVoo,
+            dataPartida,
+          )) ??
           (await this.vooRepository.create({
             numeroVoo: segmento.numeroVoo,
             origem: segmento.origem,
             destino: segmento.destino,
-            dataPartida: new Date(segmento.dataPartida),
+            dataPartida,
             dataChegada: new Date(segmento.dataChegada),
             assentosDisponiveis: 1,
             preco: precoPorTrecho,

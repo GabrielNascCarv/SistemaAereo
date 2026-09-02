@@ -166,4 +166,74 @@ describe('ImportarVooExternoUseCase', () => {
       expect.objectContaining({ vooId: 3, direcao: 'VOLTA', ordem: 1 }),
     ]);
   });
+
+  it('não deve confundir ida e volta quando reaproveitam o mesmo número de voo em datas diferentes', async () => {
+    // Regressão: a Duffel (sandbox) às vezes reusa o mesmo numeroVoo para a
+    // ida e a volta. findByNumeroVoo precisa considerar a data de partida,
+    // senão a volta é importada como cópia da ida.
+    const oferta = new OfertaVooDto({
+      ofertaId: 'off_789',
+      preco: 400,
+      moeda: 'USD',
+      origem: 'STN',
+      destino: 'JFK',
+      idaEVolta: true,
+      slices: [
+        new SliceOfertaDto({
+          direcao: 'IDA',
+          segmentos: [
+            segmento({
+              numeroVoo: 'IB3167',
+              origem: 'STN',
+              destino: 'JFK',
+              dataPartida: '2026-12-01T00:00:00.000Z',
+              dataChegada: '2026-12-01T03:00:00.000Z',
+            }),
+          ],
+        }),
+        new SliceOfertaDto({
+          direcao: 'VOLTA',
+          segmentos: [
+            segmento({
+              numeroVoo: 'IB3167',
+              origem: 'JFK',
+              destino: 'STN',
+              dataPartida: '2026-12-10T06:58:00.000Z',
+              dataChegada: '2026-12-10T19:56:00.000Z',
+            }),
+          ],
+        }),
+      ],
+    });
+    gateway.buscarOfertaPorId.mockResolvedValue(oferta);
+    vooRepository.findByNumeroVoo.mockResolvedValue(null);
+    vooRepository.create.mockImplementation((data) =>
+      Promise.resolve(
+        criarVoo({
+          id: data.origem === 'STN' ? 1 : 2,
+          numeroVoo: data.numeroVoo,
+          origem: data.origem,
+          destino: data.destino,
+          dataPartida: data.dataPartida,
+          dataChegada: data.dataChegada,
+        }),
+      ),
+    );
+
+    const resultado = await useCase.execute('off_789');
+
+    // busca cada segmento pela combinação número + data, não só o número
+    expect(vooRepository.findByNumeroVoo).toHaveBeenCalledWith(
+      'IB3167',
+      new Date('2026-12-01T00:00:00.000Z'),
+    );
+    expect(vooRepository.findByNumeroVoo).toHaveBeenCalledWith(
+      'IB3167',
+      new Date('2026-12-10T06:58:00.000Z'),
+    );
+    expect(vooRepository.create).toHaveBeenCalledTimes(2);
+    expect(resultado[0].voo.origem).toBe('STN');
+    expect(resultado[1].voo.origem).toBe('JFK');
+    expect(resultado[0].vooId).not.toBe(resultado[1].vooId);
+  });
 });

@@ -24,9 +24,12 @@ export class VooRepository implements VooRepositoryContract {
     return VooEntity.create(voo);
   }
 
-  async findByNumeroVoo(numeroVoo: string): Promise<VooEntity | null> {
+  async findByNumeroVoo(
+    numeroVoo: string,
+    dataPartida: Date,
+  ): Promise<VooEntity | null> {
     const voo = await this.prisma.voo.findUnique({
-      where: { numeroVoo },
+      where: { numeroVoo_dataPartida: { numeroVoo, dataPartida } },
     });
 
     return voo ? VooEntity.create(voo) : null;

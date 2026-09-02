@@ -12,7 +12,10 @@ export interface VooRepositoryContract {
     status?: string;
   }): Promise<VooEntity>;
 
-  findByNumeroVoo(numeroVoo: string): Promise<VooEntity | null>;
+  findByNumeroVoo(
+    numeroVoo: string,
+    dataPartida: Date,
+  ): Promise<VooEntity | null>;
   findById(id: number): Promise<VooEntity | null>;
   findAll(params: { skip: number; take: number }): Promise<{
     data: VooEntity[];

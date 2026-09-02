@@ -46,6 +46,7 @@ describe('CriarVooUseCase', () => {
 
     expect(vooRepository.findByNumeroVoo).toHaveBeenCalledWith(
       dadosValidos.numeroVoo,
+      dadosValidos.dataPartida,
     );
     expect(vooRepository.create).toHaveBeenCalledWith(dadosValidos);
     expect(resultado).toBe(vooCriado);

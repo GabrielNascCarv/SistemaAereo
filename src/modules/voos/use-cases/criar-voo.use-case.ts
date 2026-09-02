@@ -16,12 +16,15 @@ export class CriarVooUseCase implements CriarVooUseCaseContract {
     preco: number;
     status?: string;
   }) {
-    // Verificar se número do voo já existe
+    // Verificar se já existe um voo com esse número nessa data de partida
     const vooExistente = await this.vooRepository.findByNumeroVoo(
       data.numeroVoo,
+      data.dataPartida,
     );
     if (vooExistente) {
-      throw new ConflictException('Número do voo já cadastrado');
+      throw new ConflictException(
+        'Já existe um voo com esse número nessa data de partida',
+      );
     }
 
     const voo = await this.vooRepository.create(data);

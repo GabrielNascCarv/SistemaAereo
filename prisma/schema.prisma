@@ -10,7 +10,10 @@ datasource db {
 
 model Voo {
   id          Int      @id @default(autoincrement())
-  numeroVoo   String   @unique
+  // Número de voo sozinho não é único: companhias reaproveitam o mesmo
+  // número em datas diferentes (e até para o trecho de volta, no sandbox
+  // da Duffel). O identificador real de um voo é número + data de partida.
+  numeroVoo   String
   origem      String
   destino     String
   dataPartida DateTime
@@ -18,13 +21,14 @@ model Voo {
   assentosDisponiveis Int
   preco       Float
   status      String   @default("AGENDADO") // AGENDADO, CANCELADO, CONCLUIDO
-  
+
   // Relação com Reservas (via trechos — um voo pode ser perna de várias reservas)
   trechos     ReservaTrecho[]
 
   createdAt   DateTime @default(now())
   updatedAt   DateTime @updatedAt
 
+  @@unique([numeroVoo, dataPartida])
   @@map("voos")
 }
 

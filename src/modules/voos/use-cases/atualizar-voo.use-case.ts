@@ -29,12 +29,21 @@ export class AtualizarVooUseCase implements AtualizarVooUseCaseContract {
       throw new NotFoundException('Voo não encontrado');
     }
 
-    if (data.numeroVoo && data.numeroVoo !== vooExistente.numeroVoo) {
+    const numeroVooFinal = data.numeroVoo ?? vooExistente.numeroVoo;
+    const dataPartidaFinal = data.dataPartida ?? vooExistente.dataPartida;
+    const identificadorMudou =
+      numeroVooFinal !== vooExistente.numeroVoo ||
+      dataPartidaFinal.getTime() !== vooExistente.dataPartida.getTime();
+
+    if (identificadorMudou) {
       const vooComNumero = await this.vooRepository.findByNumeroVoo(
-        data.numeroVoo,
+        numeroVooFinal,
+        dataPartidaFinal,
       );
       if (vooComNumero) {
-        throw new ConflictException('Número do voo já cadastrado');
+        throw new ConflictException(
+          'Já existe um voo com esse número nessa data de partida',
+        );
       }
     }
 
