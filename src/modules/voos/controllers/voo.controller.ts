@@ -1,6 +1,7 @@
-import { Controller, Post, Body, HttpCode, HttpStatus, Get } from '@nestjs/common';
+import { Controller, Post, Body, HttpCode, HttpStatus, Get, Param, ParseIntPipe, NotFoundException } from '@nestjs/common';
 import { CriarVooUseCase } from '../use-cases/criar-voo.use-case';
 import { ListarVoosUseCase } from '../use-cases/listar-voos.use-case';
+import { ListarVooPorIdUseCase } from '../use-cases/listar-voo-por-id.use-case';
 import { CriarVooDto } from '../dto/criar-voo.dto';
 import { VooResponseDto } from '../dto/voo-response.dto';
 
@@ -9,6 +10,7 @@ export class VooController {
   constructor(
     private readonly criarVooUseCase: CriarVooUseCase,
     private readonly listarVoosUseCase: ListarVoosUseCase,
+    private readonly listarVooPorIdUseCase: ListarVooPorIdUseCase,
   ) {}
 
   @Post()
@@ -50,5 +52,27 @@ export class VooController {
       status: voo.status,
       createdAt: voo.createdAt,
     }));
+  }
+
+  @Get(':id')
+  async listarPorId(@Param('id', ParseIntPipe) id: number): Promise<VooResponseDto> {
+    const voo = await this.listarVooPorIdUseCase.execute(id);
+
+    if (!voo) {
+      throw new NotFoundException('Voo não encontrado');
+    }
+
+    return new VooResponseDto({
+      id: voo.id,
+      numeroVoo: voo.numeroVoo,
+      origem: voo.origem,
+      destino: voo.destino,
+      dataPartida: voo.dataPartida,
+      dataChegada: voo.dataChegada,
+      assentosDisponiveis: voo.assentosDisponiveis,
+      preco: voo.preco,
+      status: voo.status,
+      createdAt: voo.createdAt,
+    });
   }
 }
