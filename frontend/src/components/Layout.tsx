@@ -8,7 +8,12 @@ export function Layout() {
           <Link to="/" className="flex items-center gap-2 text-lg font-semibold tracking-tight">
             <span aria-hidden>✈️</span> Sistema Aéreo
           </Link>
-          <span className="text-xs text-slate-400">projeto de portfólio</span>
+          <div className="flex items-center gap-4">
+            <Link to="/reservas" className="text-sm text-slate-600 hover:text-slate-900">
+              Reservas
+            </Link>
+            <span className="text-xs text-slate-400">projeto de portfólio</span>
+          </div>
         </div>
       </header>
 

@@ -68,6 +68,11 @@ export function ReservarPage() {
 
       <h1 className="mt-3 text-2xl font-semibold tracking-tight">Seus dados</h1>
 
+      <div className="mt-3 rounded-lg border border-amber-200 bg-amber-50 p-3 text-sm text-amber-800">
+        ⚠️ Isto é uma demonstração de portfólio, não uma compra real. Não insira nome, email, CPF
+        ou telefone verdadeiros — use dados fictícios.
+      </div>
+
       <div className="mt-4 rounded-xl border border-slate-200 bg-white p-4">
         {oferta.slices.map((slice) => (
           <div key={slice.direcao} className="mb-2 last:mb-0">
