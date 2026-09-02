@@ -41,11 +41,11 @@ export class AtualizarVooUseCase implements AtualizarVooUseCaseContract {
     const alterandoDatas =
       data.dataPartida !== undefined || data.dataChegada !== undefined;
     if (alterandoDatas) {
-      const possuiReservaConfirmada =
-        await this.vooRepository.possuiReservaConfirmada(id);
-      if (possuiReservaConfirmada) {
+      const possuiReservaAtiva =
+        await this.vooRepository.possuiReservaAtiva(id);
+      if (possuiReservaAtiva) {
         throw new BadRequestException(
-          'Não é possível alterar as datas de um voo com reservas confirmadas',
+          'Não é possível alterar as datas de um voo com reservas ativas',
         );
       }
     }

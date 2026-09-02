@@ -2,8 +2,8 @@ import { IsIn, IsInt, IsOptional, IsPositive } from 'class-validator';
 
 export class AtualizarReservaDto {
   @IsOptional()
-  @IsIn(['CONFIRMADA', 'CANCELADA'], {
-    message: 'Status deve ser CONFIRMADA ou CANCELADA',
+  @IsIn(['PENDENTE_PAGAMENTO', 'CONFIRMADA', 'CANCELADA'], {
+    message: 'Status deve ser PENDENTE_PAGAMENTO, CONFIRMADA ou CANCELADA',
   })
   status?: string;
 

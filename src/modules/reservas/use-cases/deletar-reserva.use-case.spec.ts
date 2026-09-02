@@ -17,7 +17,7 @@ describe('DeletarReservaUseCase', () => {
       id: 1,
       codigoReserva: 'RES-XXXX-YYYY',
       dataReserva: new Date(),
-      status: 'CONFIRMADA',
+      status: 'PENDENTE_PAGAMENTO',
       numeroPassageiros: 2,
       vooId: 1,
       passageiroId: 1,

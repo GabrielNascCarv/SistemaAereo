@@ -49,7 +49,7 @@ describe('ImportarVooExternoUseCase', () => {
       findAll: jest.fn(),
       update: jest.fn(),
       delete: jest.fn(),
-      possuiReservaConfirmada: jest.fn(),
+      possuiReservaAtiva: jest.fn(),
     } as unknown as jest.Mocked<VooRepository>;
 
     useCase = new ImportarVooExternoUseCase(gateway, vooRepository);

@@ -33,10 +33,10 @@ describe('AtualizarVooUseCase', () => {
       findAll: jest.fn(),
       update: jest.fn(),
       delete: jest.fn(),
-      possuiReservaConfirmada: jest.fn(),
+      possuiReservaAtiva: jest.fn(),
     } as unknown as jest.Mocked<VooRepository>;
 
-    vooRepository.possuiReservaConfirmada.mockResolvedValue(false);
+    vooRepository.possuiReservaAtiva.mockResolvedValue(false);
 
     useCase = new AtualizarVooUseCase(vooRepository);
   });
@@ -78,7 +78,7 @@ describe('AtualizarVooUseCase', () => {
 
     await useCase.execute(1, { preco: 599.9 });
 
-    expect(vooRepository.possuiReservaConfirmada).not.toHaveBeenCalled();
+    expect(vooRepository.possuiReservaAtiva).not.toHaveBeenCalled();
   });
 
   it.each([
@@ -88,7 +88,7 @@ describe('AtualizarVooUseCase', () => {
     'deve lançar BadRequestException ao alterar %s de um voo com reserva confirmada',
     async (_campo, alteracao) => {
       vooRepository.findById.mockResolvedValue(vooExistente);
-      vooRepository.possuiReservaConfirmada.mockResolvedValue(true);
+      vooRepository.possuiReservaAtiva.mockResolvedValue(true);
 
       await expect(useCase.execute(1, alteracao)).rejects.toThrow(
         BadRequestException,
@@ -99,7 +99,7 @@ describe('AtualizarVooUseCase', () => {
 
   it('deve permitir alterar as datas quando não há reserva confirmada', async () => {
     vooRepository.findById.mockResolvedValue(vooExistente);
-    vooRepository.possuiReservaConfirmada.mockResolvedValue(false);
+    vooRepository.possuiReservaAtiva.mockResolvedValue(false);
     vooRepository.update.mockResolvedValue(vooExistente);
 
     const novaData = { dataPartida: new Date('2026-11-01T10:00:00.000Z') };

@@ -150,6 +150,7 @@ describe('CriarReservaUseCase', () => {
         numeroPassageiros: 2,
         vooId: 1,
         passageiroId: 1,
+        status: 'PENDENTE_PAGAMENTO',
       }),
     );
     expect(vooRepository.update).toHaveBeenCalledWith(voo.id, {

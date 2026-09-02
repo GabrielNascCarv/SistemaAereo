@@ -58,6 +58,9 @@ export class CriarReservaUseCase implements CriarReservaUseCaseContract {
       numeroPassageiros: data.numeroPassageiros,
       vooId: data.vooId,
       passageiroId: data.passageiroId,
+      // Sem gateway de pagamento integrado: a reserva nasce aguardando
+      // pagamento e o assento já é reservado (fica CANCELADA se desistir).
+      status: 'PENDENTE_PAGAMENTO',
     });
 
     await this.vooRepository.update(voo.id, {

@@ -60,7 +60,7 @@ describe('Reservas (e2e)', () => {
     await limparBanco();
   });
 
-  it('deve criar uma reserva e decrementar os assentos disponíveis do voo', async () => {
+  it('deve criar uma reserva pendente de pagamento e decrementar os assentos disponíveis do voo', async () => {
     const passageiroId = await criarPassageiro();
     const vooId = await criarVoo();
 
@@ -71,7 +71,7 @@ describe('Reservas (e2e)', () => {
     const reserva = corpoComo<ReservaResponseDto>(resposta);
 
     expect(reserva).toMatchObject({
-      status: 'CONFIRMADA',
+      status: 'PENDENTE_PAGAMENTO',
       numeroPassageiros: 2,
       vooId,
       passageiroId,
@@ -153,7 +153,7 @@ describe('Reservas (e2e)', () => {
     );
   });
 
-  it('deve deletar uma reserva confirmada e restaurar os assentos do voo', async () => {
+  it('deve deletar uma reserva ativa e restaurar os assentos do voo', async () => {
     const passageiroId = await criarPassageiro();
     const vooId = await criarVoo();
 
@@ -201,7 +201,7 @@ describe('Reservas (e2e)', () => {
     expect(pagina.totalPages).toBe(2);
   });
 
-  it('deve impedir alterar as datas de um voo com reserva confirmada', async () => {
+  it('deve impedir alterar as datas de um voo com reserva ativa', async () => {
     const passageiroId = await criarPassageiro();
     const vooId = await criarVoo();
 
@@ -216,7 +216,7 @@ describe('Reservas (e2e)', () => {
       .expect(400);
   });
 
-  it('deve permitir alterar outros campos do voo mesmo com reserva confirmada', async () => {
+  it('deve permitir alterar outros campos do voo mesmo com reserva ativa', async () => {
     const passageiroId = await criarPassageiro();
     const vooId = await criarVoo();
 
