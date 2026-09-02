@@ -1,8 +1,9 @@
-import { Controller, Post, Body, HttpCode, HttpStatus, Get, Param, ParseIntPipe, NotFoundException, Put } from '@nestjs/common';
+import { Controller, Post, Body, HttpCode, HttpStatus, Get, Param, ParseIntPipe, NotFoundException, Put, Delete } from '@nestjs/common';
 import { CriarVooUseCase } from '../use-cases/criar-voo.use-case';
 import { ListarVoosUseCase } from '../use-cases/listar-voos.use-case';
 import { ListarVooPorIdUseCase } from '../use-cases/listar-voo-por-id.use-case';
 import { AtualizarVooUseCase } from '../use-cases/atualizar-voo.use-case';
+import { DeletarVooUseCase } from '../use-cases/deletar-voo.use-case';
 import { CriarVooDto } from '../dto/criar-voo.dto';
 import { AtualizarVooDto } from '../dto/atualizar-voo.dto';
 import { VooResponseDto } from '../dto/voo-response.dto';
@@ -14,6 +15,7 @@ export class VooController {
     private readonly listarVoosUseCase: ListarVoosUseCase,
     private readonly listarVooPorIdUseCase: ListarVooPorIdUseCase,
     private readonly atualizarVooUseCase: AtualizarVooUseCase,
+    private readonly deletarVooUseCase: DeletarVooUseCase,
   ) {}
 
   @Post()
@@ -102,5 +104,15 @@ export class VooController {
       status: voo.status,
       createdAt: voo.createdAt,
     });
+  }
+
+  @Delete(':id')
+  async deletar(@Param('id', ParseIntPipe) id: number): Promise<{ success: boolean; message: string }> {
+    const success = await this.deletarVooUseCase.execute(id);
+
+    return {
+      success,
+      message: success ? 'Voo deletado com sucesso' : 'Erro ao deletar voo',
+    };
   }
 }

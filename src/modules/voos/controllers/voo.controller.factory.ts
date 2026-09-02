@@ -4,6 +4,7 @@ import { CriarVooUseCaseFactory } from '../use-cases/factory/criar-voo.use-case.
 import { ListarVoosUseCaseFactory } from '../use-cases/factory/listar-voos.use-case.factory';
 import { ListarVooPorIdUseCaseFactory } from '../use-cases/factory/listar-voo-por-id.use-case.factory';
 import { AtualizarVooUseCaseFactory } from '../use-cases/factory/atualizar-voo.use-case.factory';
+import { DeletarVooUseCaseFactory } from '../use-cases/factory/deletar-voo.use-case.factory';
 
 @Injectable()
 export class VooControllerFactory {
@@ -12,6 +13,7 @@ export class VooControllerFactory {
     private readonly listarVoosUseCaseFactory: ListarVoosUseCaseFactory,
     private readonly listarVooPorIdUseCaseFactory: ListarVooPorIdUseCaseFactory,
     private readonly atualizarVooUseCaseFactory: AtualizarVooUseCaseFactory,
+    private readonly deletarVooUseCaseFactory: DeletarVooUseCaseFactory,
   ) {}
 
   create(): VooController {
@@ -19,6 +21,7 @@ export class VooControllerFactory {
     const listarVoosUseCase = this.listarVoosUseCaseFactory.create();
     const listarVooPorIdUseCase = this.listarVooPorIdUseCaseFactory.create();
     const atualizarVooUseCase = this.atualizarVooUseCaseFactory.create();
-    return new VooController(criarVooUseCase, listarVoosUseCase, listarVooPorIdUseCase, atualizarVooUseCase);
+    const deletarVooUseCase = this.deletarVooUseCaseFactory.create();
+    return new VooController(criarVooUseCase, listarVoosUseCase, listarVooPorIdUseCase, atualizarVooUseCase, deletarVooUseCase);
   }
 }
