@@ -14,7 +14,10 @@ export interface VooRepositoryContract {
 
   findByNumeroVoo(numeroVoo: string): Promise<VooEntity | null>;
   findById(id: number): Promise<VooEntity | null>;
-  findAll(): Promise<VooEntity[]>;
+  findAll(params: { skip: number; take: number }): Promise<{
+    data: VooEntity[];
+    total: number;
+  }>;
   update(id: number, data: {
     numeroVoo?: string;
     origem?: string;

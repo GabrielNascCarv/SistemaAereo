@@ -40,12 +40,23 @@ export class VooRepository implements VooRepositoryContract {
     return voo ? VooEntity.create(voo) : null;
   }
 
-  async findAll(): Promise<VooEntity[]> {
-    const voos = await this.prisma.voo.findMany({
-      orderBy: { createdAt: 'desc' },
-    });
+  async findAll(params: { skip: number; take: number }): Promise<{
+    data: VooEntity[];
+    total: number;
+  }> {
+    const [voos, total] = await Promise.all([
+      this.prisma.voo.findMany({
+        skip: params.skip,
+        take: params.take,
+        orderBy: { createdAt: 'desc' },
+      }),
+      this.prisma.voo.count(),
+    ]);
 
-    return voos.map(voo => VooEntity.create(voo));
+    return {
+      data: voos.map(voo => VooEntity.create(voo)),
+      total,
+    };
   }
 
   async update(id: number, data: {

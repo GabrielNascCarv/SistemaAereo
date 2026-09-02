@@ -1,5 +1,8 @@
 import { VooEntity } from '../entities/voo.entity';
 
 export interface ListarVoosUseCaseContract {
-  execute(): Promise<VooEntity[]>;
+  execute(params: { page: number; limit: number }): Promise<{
+    data: VooEntity[];
+    total: number;
+  }>;
 }

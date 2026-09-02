@@ -6,7 +6,8 @@ import { VooRepository } from '../repositories/voo.repository';
 export class ListarVoosUseCase implements ListarVoosUseCaseContract {
   constructor(private readonly vooRepository: VooRepository) {}
 
-  async execute() {
-    return await this.vooRepository.findAll();
+  async execute(params: { page: number; limit: number }) {
+    const skip = (params.page - 1) * params.limit;
+    return await this.vooRepository.findAll({ skip, take: params.limit });
   }
 }
