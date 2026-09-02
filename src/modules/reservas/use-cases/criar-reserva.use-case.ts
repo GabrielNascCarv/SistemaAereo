@@ -19,18 +19,38 @@ export class CriarReservaUseCase implements CriarReservaUseCaseContract {
 
   async execute(data: {
     numeroPassageiros: number;
-    vooId: number;
     passageiroId: number;
+    trechos: Array<{ vooId: number; direcao: 'IDA' | 'VOLTA'; ordem: number }>;
   }) {
-    const voo = await this.vooRepository.findById(data.vooId);
-    if (!voo) {
-      throw new NotFoundException('Voo não encontrado');
+    if (data.trechos.length === 0) {
+      throw new BadRequestException('A reserva precisa de ao menos um trecho');
     }
 
-    if (voo.status === 'CANCELADO' || voo.status === 'CONCLUIDO') {
-      throw new BadRequestException(
-        'Não é possível reservar em um voo cancelado ou concluído',
-      );
+    // Um mesmo voo pode aparecer só uma vez por reserva (ordem/direção únicas
+    // já garantem isso no banco, mas validamos cedo pra dar um erro melhor).
+    const vooIdsUnicos = [
+      ...new Set(data.trechos.map((trecho) => trecho.vooId)),
+    ];
+
+    const voos = await Promise.all(
+      vooIdsUnicos.map((vooId) => this.vooRepository.findById(vooId)),
+    );
+
+    for (let i = 0; i < voos.length; i++) {
+      const voo = voos[i];
+      if (!voo) {
+        throw new NotFoundException(`Voo ${vooIdsUnicos[i]} não encontrado`);
+      }
+      if (voo.status === 'CANCELADO' || voo.status === 'CONCLUIDO') {
+        throw new BadRequestException(
+          `Não é possível reservar o voo ${voo.numeroVoo}: está cancelado ou concluído`,
+        );
+      }
+      if (voo.assentosDisponiveis < data.numeroPassageiros) {
+        throw new BadRequestException(
+          `Assentos disponíveis insuficientes no voo ${voo.numeroVoo}`,
+        );
+      }
     }
 
     const passageiro = await this.passageiroRepository.findById(
@@ -38,12 +58,6 @@ export class CriarReservaUseCase implements CriarReservaUseCaseContract {
     );
     if (!passageiro) {
       throw new NotFoundException('Passageiro não encontrado');
-    }
-
-    if (voo.assentosDisponiveis < data.numeroPassageiros) {
-      throw new BadRequestException(
-        'Assentos disponíveis insuficientes para este voo',
-      );
     }
 
     const codigoReserva = this.gerarCodigoReserva();
@@ -56,16 +70,21 @@ export class CriarReservaUseCase implements CriarReservaUseCaseContract {
     const reserva = await this.reservaRepository.create({
       codigoReserva,
       numeroPassageiros: data.numeroPassageiros,
-      vooId: data.vooId,
       passageiroId: data.passageiroId,
+      trechos: data.trechos,
       // Sem gateway de pagamento integrado: a reserva nasce aguardando
       // pagamento e o assento já é reservado (fica CANCELADA se desistir).
       status: 'PENDENTE_PAGAMENTO',
     });
 
-    await this.vooRepository.update(voo.id, {
-      assentosDisponiveis: voo.assentosDisponiveis - data.numeroPassageiros,
-    });
+    await Promise.all(
+      voos.map((voo) =>
+        this.vooRepository.update(voo!.id, {
+          assentosDisponiveis:
+            voo!.assentosDisponiveis - data.numeroPassageiros,
+        }),
+      ),
+    );
 
     return reserva;
   }

@@ -19,9 +19,9 @@ model Voo {
   preco       Float
   status      String   @default("AGENDADO") // AGENDADO, CANCELADO, CONCLUIDO
   
-  // Relação com Reservas
-  reservas    Reserva[]
-  
+  // Relação com Reservas (via trechos — um voo pode ser perna de várias reservas)
+  trechos     ReservaTrecho[]
+
   createdAt   DateTime @default(now())
   updatedAt   DateTime @updatedAt
 
@@ -48,18 +48,35 @@ model Reserva {
   id           Int      @id @default(autoincrement())
   codigoReserva String  @unique
   dataReserva  DateTime @default(now())
-  status       String   @default("CONFIRMADA") // CONFIRMADA, CANCELADA
+  status       String   @default("PENDENTE_PAGAMENTO") // PENDENTE_PAGAMENTO, CONFIRMADA, CANCELADA
   numeroPassageiros Int
-  
-  // Relações
-  vooId       Int
-  voo         Voo @relation(fields: [vooId], references: [id], onDelete: Cascade)
-  
+
+  // Uma reserva tem 1+ trechos (conexões) para a ida e, se for ida e volta, 1+ para a volta
+  trechos      ReservaTrecho[]
+
   passageiroId Int
   passageiro   Passageiro @relation(fields: [passageiroId], references: [id], onDelete: Cascade)
-  
+
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 
   @@map("reservas")
+}
+
+model ReservaTrecho {
+  id        Int      @id @default(autoincrement())
+
+  reservaId Int
+  reserva   Reserva  @relation(fields: [reservaId], references: [id], onDelete: Cascade)
+
+  vooId     Int
+  voo       Voo      @relation(fields: [vooId], references: [id])
+
+  direcao   String   // IDA, VOLTA
+  ordem     Int      // posição do trecho dentro da direção (1 = primeiro, 2 = conexão seguinte...)
+
+  createdAt DateTime @default(now())
+
+  @@unique([reservaId, direcao, ordem])
+  @@map("reserva_trechos")
 }

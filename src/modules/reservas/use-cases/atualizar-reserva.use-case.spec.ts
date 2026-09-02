@@ -3,28 +3,13 @@ import { AtualizarReservaUseCase } from './atualizar-reserva.use-case';
 import { ReservaRepository } from '../repositories/reserva.repository';
 import { VooRepository } from '../../voos/repositories/voo.repository';
 import { ReservaEntity } from '../entities/reserva.entity';
+import { TrechoReservaEntity } from '../entities/trecho-reserva.entity';
 import { VooEntity } from '../../voos/entities/voo.entity';
 
 describe('AtualizarReservaUseCase', () => {
   let useCase: AtualizarReservaUseCase;
   let reservaRepository: jest.Mocked<ReservaRepository>;
   let vooRepository: jest.Mocked<VooRepository>;
-
-  const criarReserva = (
-    overrides: Partial<Parameters<typeof ReservaEntity.create>[0]> = {},
-  ) =>
-    ReservaEntity.create({
-      id: 1,
-      codigoReserva: 'RES-XXXX-YYYY',
-      dataReserva: new Date(),
-      status: 'PENDENTE_PAGAMENTO',
-      numeroPassageiros: 2,
-      vooId: 1,
-      passageiroId: 1,
-      createdAt: new Date(),
-      updatedAt: new Date(),
-      ...overrides,
-    });
 
   const criarVoo = (
     overrides: Partial<Parameters<typeof VooEntity.create>[0]> = {},
@@ -39,6 +24,31 @@ describe('AtualizarReservaUseCase', () => {
       assentosDisponiveis: 98,
       preco: 499.9,
       status: 'AGENDADO',
+      createdAt: new Date(),
+      updatedAt: new Date(),
+      ...overrides,
+    });
+
+  const criarReserva = (
+    overrides: Partial<Parameters<typeof ReservaEntity.create>[0]> = {},
+    voo = criarVoo(),
+  ) =>
+    ReservaEntity.create({
+      id: 1,
+      codigoReserva: 'RES-XXXX-YYYY',
+      dataReserva: new Date(),
+      status: 'PENDENTE_PAGAMENTO',
+      numeroPassageiros: 2,
+      passageiroId: 1,
+      trechos: [
+        TrechoReservaEntity.create({
+          id: 1,
+          vooId: voo.id,
+          direcao: 'IDA',
+          ordem: 1,
+          voo,
+        }),
+      ],
       createdAt: new Date(),
       updatedAt: new Date(),
       ...overrides,
@@ -86,19 +96,17 @@ describe('AtualizarReservaUseCase', () => {
   });
 
   it('deve restaurar os assentos do voo ao cancelar a reserva', async () => {
+    const voo = criarVoo({ assentosDisponiveis: 98 });
     reservaRepository.findById.mockResolvedValue(
-      criarReserva({ numeroPassageiros: 2 }),
-    );
-    vooRepository.findById.mockResolvedValue(
-      criarVoo({ assentosDisponiveis: 98 }),
+      criarReserva({ numeroPassageiros: 2 }, voo),
     );
     reservaRepository.update.mockResolvedValue(
-      criarReserva({ status: 'CANCELADA' }),
+      criarReserva({ status: 'CANCELADA' }, voo),
     );
 
     await useCase.execute(1, { status: 'CANCELADA' });
 
-    expect(vooRepository.update).toHaveBeenCalledWith(1, {
+    expect(vooRepository.update).toHaveBeenCalledWith(voo.id, {
       assentosDisponiveis: 100,
     });
     expect(reservaRepository.update).toHaveBeenCalledWith(1, {
@@ -106,12 +114,52 @@ describe('AtualizarReservaUseCase', () => {
     });
   });
 
-  it('deve lançar BadRequestException ao aumentar passageiros sem assentos suficientes', async () => {
+  it('deve restaurar os assentos de todos os trechos de um itinerário de ida e volta', async () => {
+    const vooIda = criarVoo({ id: 1, assentosDisponiveis: 10 });
+    const vooVolta = criarVoo({ id: 2, assentosDisponiveis: 20 });
     reservaRepository.findById.mockResolvedValue(
-      criarReserva({ numeroPassageiros: 2 }),
+      ReservaEntity.create({
+        id: 1,
+        codigoReserva: 'RES-XXXX-YYYY',
+        dataReserva: new Date(),
+        status: 'PENDENTE_PAGAMENTO',
+        numeroPassageiros: 2,
+        passageiroId: 1,
+        trechos: [
+          TrechoReservaEntity.create({
+            id: 1,
+            vooId: 1,
+            direcao: 'IDA',
+            ordem: 1,
+            voo: vooIda,
+          }),
+          TrechoReservaEntity.create({
+            id: 2,
+            vooId: 2,
+            direcao: 'VOLTA',
+            ordem: 1,
+            voo: vooVolta,
+          }),
+        ],
+        createdAt: new Date(),
+        updatedAt: new Date(),
+      }),
     );
-    vooRepository.findById.mockResolvedValue(
-      criarVoo({ assentosDisponiveis: 1 }),
+
+    await useCase.execute(1, { status: 'CANCELADA' });
+
+    expect(vooRepository.update).toHaveBeenCalledWith(1, {
+      assentosDisponiveis: 12,
+    });
+    expect(vooRepository.update).toHaveBeenCalledWith(2, {
+      assentosDisponiveis: 22,
+    });
+  });
+
+  it('deve lançar BadRequestException ao aumentar passageiros sem assentos suficientes', async () => {
+    const voo = criarVoo({ assentosDisponiveis: 1 });
+    reservaRepository.findById.mockResolvedValue(
+      criarReserva({ numeroPassageiros: 2 }, voo),
     );
 
     await expect(useCase.execute(1, { numeroPassageiros: 4 })).rejects.toThrow(
@@ -121,20 +169,18 @@ describe('AtualizarReservaUseCase', () => {
   });
 
   it('deve ajustar os assentos do voo ao mudar o número de passageiros da reserva', async () => {
+    const voo = criarVoo({ assentosDisponiveis: 98 });
     reservaRepository.findById.mockResolvedValue(
-      criarReserva({ numeroPassageiros: 2 }),
-    );
-    vooRepository.findById.mockResolvedValue(
-      criarVoo({ assentosDisponiveis: 98 }),
+      criarReserva({ numeroPassageiros: 2 }, voo),
     );
     reservaRepository.update.mockResolvedValue(
-      criarReserva({ numeroPassageiros: 4 }),
+      criarReserva({ numeroPassageiros: 4 }, voo),
     );
 
     await useCase.execute(1, { numeroPassageiros: 4 });
 
     // diferença de +2 passageiros deve tirar 2 assentos disponíveis do voo
-    expect(vooRepository.update).toHaveBeenCalledWith(1, {
+    expect(vooRepository.update).toHaveBeenCalledWith(voo.id, {
       assentosDisponiveis: 96,
     });
   });

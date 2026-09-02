@@ -1,11 +1,13 @@
+import { TrechoReservaResponseDto } from './trecho-reserva-response.dto';
+
 export class ReservaResponseDto {
   id: number;
   codigoReserva: string;
   dataReserva: Date;
   status: string;
   numeroPassageiros: number;
-  vooId: number;
   passageiroId: number;
+  trechos: TrechoReservaResponseDto[];
   createdAt: Date;
 
   constructor(data: {
@@ -14,8 +16,8 @@ export class ReservaResponseDto {
     dataReserva: Date;
     status: string;
     numeroPassageiros: number;
-    vooId: number;
     passageiroId: number;
+    trechos: TrechoReservaResponseDto[];
     createdAt: Date;
   }) {
     this.id = data.id;
@@ -23,8 +25,8 @@ export class ReservaResponseDto {
     this.dataReserva = data.dataReserva;
     this.status = data.status;
     this.numeroPassageiros = data.numeroPassageiros;
-    this.vooId = data.vooId;
     this.passageiroId = data.passageiroId;
+    this.trechos = data.trechos;
     this.createdAt = data.createdAt;
   }
 }

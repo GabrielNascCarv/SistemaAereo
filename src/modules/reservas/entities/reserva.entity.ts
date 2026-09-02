@@ -1,3 +1,5 @@
+import { TrechoReservaEntity } from './trecho-reserva.entity';
+
 export class ReservaEntity {
   constructor(
     public readonly id: number,
@@ -5,8 +7,8 @@ export class ReservaEntity {
     public readonly dataReserva: Date,
     public readonly status: string,
     public readonly numeroPassageiros: number,
-    public readonly vooId: number,
     public readonly passageiroId: number,
+    public readonly trechos: TrechoReservaEntity[],
     public readonly createdAt: Date,
     public readonly updatedAt: Date,
   ) {}
@@ -17,8 +19,8 @@ export class ReservaEntity {
     dataReserva: Date;
     status: string;
     numeroPassageiros: number;
-    vooId: number;
     passageiroId: number;
+    trechos: TrechoReservaEntity[];
     createdAt: Date;
     updatedAt: Date;
   }): ReservaEntity {
@@ -28,8 +30,8 @@ export class ReservaEntity {
       data.dataReserva,
       data.status,
       data.numeroPassageiros,
-      data.vooId,
       data.passageiroId,
+      data.trechos,
       data.createdAt,
       data.updatedAt,
     );

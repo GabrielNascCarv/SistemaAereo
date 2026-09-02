@@ -4,9 +4,9 @@ export interface ReservaRepositoryContract {
   create(data: {
     codigoReserva: string;
     numeroPassageiros: number;
-    vooId: number;
     passageiroId: number;
     status?: string;
+    trechos: Array<{ vooId: number; direcao: 'IDA' | 'VOLTA'; ordem: number }>;
   }): Promise<ReservaEntity>;
 
   findByCodigoReserva(codigoReserva: string): Promise<ReservaEntity | null>;

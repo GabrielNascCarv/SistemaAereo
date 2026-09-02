@@ -6,6 +6,8 @@ import {
 import { ConfigService } from '@nestjs/config';
 import { BuscaVoosGatewayContract } from '../contracts/busca-voos-gateway.contract';
 import { OfertaVooDto } from '../dto/oferta-voo.dto';
+import { SliceOfertaDto } from '../dto/slice-oferta.dto';
+import { SegmentoOfertaDto } from '../dto/segmento-oferta.dto';
 import { SugestaoLugarDto } from '../dto/sugestao-lugar.dto';
 
 interface DuffelSegmento {
@@ -36,9 +38,10 @@ interface DuffelLugar {
  * Usa o ambiente de teste (sandbox) por padrão — nenhum dado é gerado ao vivo
  * enquanto DUFFEL_API_TOKEN não for configurado com um token de teste real.
  *
- * MVP: assume voos de ida, sem escala (1 slice, 1 segmento). Voos com conexão
- * retornam apenas o primeiro segmento — suficiente para importar como uma
- * linha da tabela `voos`, que hoje não modela múltiplos trechos.
+ * Cada slice da Duffel (ida ou volta) pode ter vários segments (conexões).
+ * Mapeamos slice → direção (IDA/VOLTA) e segment → trecho, na ordem em que
+ * aparecem — essa ordem é o que popula `ReservaTrecho.ordem` quando a oferta
+ * é importada.
  */
 @Injectable()
 export class DuffelGateway implements BuscaVoosGatewayContract {
@@ -85,21 +88,31 @@ export class DuffelGateway implements BuscaVoosGatewayContract {
   async buscarOfertas(params: {
     origem: string;
     destino: string;
-    data: string;
+    dataIda: string;
+    dataVolta?: string;
   }): Promise<OfertaVooDto[]> {
+    const slices = [
+      {
+        origin: params.origem,
+        destination: params.destino,
+        departure_date: params.dataIda,
+      },
+    ];
+    if (params.dataVolta) {
+      slices.push({
+        origin: params.destino,
+        destination: params.origem,
+        departure_date: params.dataVolta,
+      });
+    }
+
     const resposta = await this.chamarApi<{ data: { offers: DuffelOferta[] } }>(
       '/air/offer_requests?return_offers=true',
       {
         method: 'POST',
         body: JSON.stringify({
           data: {
-            slices: [
-              {
-                origin: params.origem,
-                destination: params.destino,
-                departure_date: params.data,
-              },
-            ],
+            slices,
             passengers: [{ type: 'adult' }],
             cabin_class: 'economy',
           },
@@ -138,21 +151,41 @@ export class DuffelGateway implements BuscaVoosGatewayContract {
   }
 
   private paraOfertaVooDto(oferta: DuffelOferta): OfertaVooDto {
-    const segmento = oferta.slices[0]?.segments[0];
-    if (!segmento) {
+    if (
+      oferta.slices.length === 0 ||
+      oferta.slices.some((slice) => slice.segments.length === 0)
+    ) {
       throw new BadGatewayException('Oferta da Duffel sem segmentos de voo');
     }
 
+    const slices = oferta.slices.map(
+      (slice, indice) =>
+        new SliceOfertaDto({
+          direcao: indice === 0 ? 'IDA' : 'VOLTA',
+          segmentos: slice.segments.map(
+            (segmento) =>
+              new SegmentoOfertaDto({
+                numeroVoo: `${segmento.marketing_carrier.iata_code}${segmento.marketing_carrier_flight_number}`,
+                companhia: segmento.marketing_carrier.name,
+                origem: segmento.origin.iata_code,
+                destino: segmento.destination.iata_code,
+                dataPartida: segmento.departing_at,
+                dataChegada: segmento.arriving_at,
+              }),
+          ),
+        }),
+    );
+
+    const segmentosIda = slices[0].segmentos;
+
     return new OfertaVooDto({
       ofertaId: oferta.id,
-      companhia: segmento.marketing_carrier.name,
-      numeroVoo: `${segmento.marketing_carrier.iata_code}${segmento.marketing_carrier_flight_number}`,
-      origem: segmento.origin.iata_code,
-      destino: segmento.destination.iata_code,
-      dataPartida: segmento.departing_at,
-      dataChegada: segmento.arriving_at,
       preco: Number(oferta.total_amount),
       moeda: oferta.total_currency,
+      origem: segmentosIda[0].origem,
+      destino: segmentosIda[segmentosIda.length - 1].destino,
+      idaEVolta: slices.length > 1,
+      slices,
     });
   }
 }

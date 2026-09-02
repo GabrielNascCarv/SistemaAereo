@@ -4,6 +4,7 @@ import { ReservaRepository } from '../repositories/reserva.repository';
 import { VooRepository } from '../../voos/repositories/voo.repository';
 import { PassageiroRepository } from '../../passageiros/repositories/passageiro.repository';
 import { ReservaEntity } from '../entities/reserva.entity';
+import { TrechoReservaEntity } from '../entities/trecho-reserva.entity';
 import { VooEntity } from '../../voos/entities/voo.entity';
 import { PassageiroEntity } from '../../passageiros/entities/passageiro.entity';
 
@@ -45,10 +46,18 @@ describe('CriarReservaUseCase', () => {
     id: 1,
     codigoReserva: 'RES-XXXX-YYYY',
     dataReserva: new Date(),
-    status: 'CONFIRMADA',
+    status: 'PENDENTE_PAGAMENTO',
     numeroPassageiros: 2,
-    vooId: 1,
     passageiroId: 1,
+    trechos: [
+      TrechoReservaEntity.create({
+        id: 1,
+        vooId: 1,
+        direcao: 'IDA',
+        ordem: 1,
+        voo: criarVoo(),
+      }),
+    ],
     createdAt: new Date(),
     updatedAt: new Date(),
   });
@@ -89,7 +98,18 @@ describe('CriarReservaUseCase', () => {
     );
   });
 
-  const dadosValidos = { vooId: 1, passageiroId: 1, numeroPassageiros: 2 };
+  const dadosValidos = {
+    passageiroId: 1,
+    numeroPassageiros: 2,
+    trechos: [{ vooId: 1, direcao: 'IDA' as const, ordem: 1 }],
+  };
+
+  it('deve lançar BadRequestException quando não há trechos', async () => {
+    await expect(
+      useCase.execute({ ...dadosValidos, trechos: [] }),
+    ).rejects.toThrow(BadRequestException);
+    expect(reservaRepository.create).not.toHaveBeenCalled();
+  });
 
   it('deve lançar NotFoundException quando o voo não existe', async () => {
     vooRepository.findById.mockResolvedValue(null);
@@ -148,8 +168,8 @@ describe('CriarReservaUseCase', () => {
         // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment -- matcher do Jest é tipado como `any`
         codigoReserva: expect.stringMatching(/^RES-/),
         numeroPassageiros: 2,
-        vooId: 1,
         passageiroId: 1,
+        trechos: dadosValidos.trechos,
         status: 'PENDENTE_PAGAMENTO',
       }),
     );
@@ -157,5 +177,36 @@ describe('CriarReservaUseCase', () => {
       assentosDisponiveis: 98,
     });
     expect(resultado).toBe(reservaCriada);
+  });
+
+  it('deve validar cada trecho de um itinerário de ida e volta', async () => {
+    const vooIda = criarVoo({ id: 1, numeroVoo: 'AB123' });
+    const vooVolta = criarVoo({ id: 2, numeroVoo: 'CD456' });
+    vooRepository.findById.mockImplementation((id) =>
+      Promise.resolve(id === 1 ? vooIda : id === 2 ? vooVolta : null),
+    );
+    passageiroRepository.findById.mockResolvedValue(passageiro);
+    reservaRepository.findByCodigoReserva.mockResolvedValue(null);
+    reservaRepository.create.mockResolvedValue(reservaCriada);
+
+    const dados = {
+      passageiroId: 1,
+      numeroPassageiros: 1,
+      trechos: [
+        { vooId: 1, direcao: 'IDA' as const, ordem: 1 },
+        { vooId: 2, direcao: 'VOLTA' as const, ordem: 1 },
+      ],
+    };
+
+    await useCase.execute(dados);
+
+    expect(vooRepository.findById).toHaveBeenCalledWith(1);
+    expect(vooRepository.findById).toHaveBeenCalledWith(2);
+    expect(vooRepository.update).toHaveBeenCalledWith(1, {
+      assentosDisponiveis: 99,
+    });
+    expect(vooRepository.update).toHaveBeenCalledWith(2, {
+      assentosDisponiveis: 99,
+    });
   });
 });

@@ -20,6 +20,9 @@ import { DeletarReservaUseCase } from '../use-cases/deletar-reserva.use-case';
 import { CriarReservaDto } from '../dto/criar-reserva.dto';
 import { AtualizarReservaDto } from '../dto/atualizar-reserva.dto';
 import { ReservaResponseDto } from '../dto/reserva-response.dto';
+import { TrechoReservaResponseDto } from '../dto/trecho-reserva-response.dto';
+import { VooResponseDto } from '../../voos/dto/voo-response.dto';
+import { ReservaEntity } from '../entities/reserva.entity';
 import { PaginacaoQueryDto } from '../../../core/common/dto/paginacao-query.dto';
 import { PaginaResultadoDto } from '../../../core/common/dto/pagina-resultado.dto';
 
@@ -37,17 +40,7 @@ export class ReservaController {
   @HttpCode(HttpStatus.CREATED)
   async criar(@Body() data: CriarReservaDto): Promise<ReservaResponseDto> {
     const reserva = await this.criarReservaUseCase.execute(data);
-
-    return new ReservaResponseDto({
-      id: reserva.id,
-      codigoReserva: reserva.codigoReserva,
-      dataReserva: reserva.dataReserva,
-      status: reserva.status,
-      numeroPassageiros: reserva.numeroPassageiros,
-      vooId: reserva.vooId,
-      passageiroId: reserva.passageiroId,
-      createdAt: reserva.createdAt,
-    });
+    return this.paraResponseDto(reserva);
   }
 
   @Get()
@@ -60,19 +53,7 @@ export class ReservaController {
       limit,
     });
 
-    const reservas = data.map(
-      (reserva) =>
-        new ReservaResponseDto({
-          id: reserva.id,
-          codigoReserva: reserva.codigoReserva,
-          dataReserva: reserva.dataReserva,
-          status: reserva.status,
-          numeroPassageiros: reserva.numeroPassageiros,
-          vooId: reserva.vooId,
-          passageiroId: reserva.passageiroId,
-          createdAt: reserva.createdAt,
-        }),
-    );
+    const reservas = data.map((reserva) => this.paraResponseDto(reserva));
 
     return new PaginaResultadoDto(reservas, total, page, limit);
   }
@@ -87,16 +68,7 @@ export class ReservaController {
       throw new NotFoundException('Reserva não encontrada');
     }
 
-    return new ReservaResponseDto({
-      id: reserva.id,
-      codigoReserva: reserva.codigoReserva,
-      dataReserva: reserva.dataReserva,
-      status: reserva.status,
-      numeroPassageiros: reserva.numeroPassageiros,
-      vooId: reserva.vooId,
-      passageiroId: reserva.passageiroId,
-      createdAt: reserva.createdAt,
-    });
+    return this.paraResponseDto(reserva);
   }
 
   @Put(':id')
@@ -105,17 +77,7 @@ export class ReservaController {
     @Body() data: AtualizarReservaDto,
   ): Promise<ReservaResponseDto> {
     const reserva = await this.atualizarReservaUseCase.execute(id, data);
-
-    return new ReservaResponseDto({
-      id: reserva.id,
-      codigoReserva: reserva.codigoReserva,
-      dataReserva: reserva.dataReserva,
-      status: reserva.status,
-      numeroPassageiros: reserva.numeroPassageiros,
-      vooId: reserva.vooId,
-      passageiroId: reserva.passageiroId,
-      createdAt: reserva.createdAt,
-    });
+    return this.paraResponseDto(reserva);
   }
 
   @Delete(':id')
@@ -130,5 +92,37 @@ export class ReservaController {
         ? 'Reserva deletada com sucesso'
         : 'Erro ao deletar reserva',
     };
+  }
+
+  private paraResponseDto(reserva: ReservaEntity): ReservaResponseDto {
+    return new ReservaResponseDto({
+      id: reserva.id,
+      codigoReserva: reserva.codigoReserva,
+      dataReserva: reserva.dataReserva,
+      status: reserva.status,
+      numeroPassageiros: reserva.numeroPassageiros,
+      passageiroId: reserva.passageiroId,
+      createdAt: reserva.createdAt,
+      trechos: reserva.trechos.map(
+        (trecho) =>
+          new TrechoReservaResponseDto({
+            vooId: trecho.vooId,
+            direcao: trecho.direcao,
+            ordem: trecho.ordem,
+            voo: new VooResponseDto({
+              id: trecho.voo.id,
+              numeroVoo: trecho.voo.numeroVoo,
+              origem: trecho.voo.origem,
+              destino: trecho.voo.destino,
+              dataPartida: trecho.voo.dataPartida,
+              dataChegada: trecho.voo.dataChegada,
+              assentosDisponiveis: trecho.voo.assentosDisponiveis,
+              preco: trecho.voo.preco,
+              status: trecho.voo.status,
+              createdAt: trecho.voo.createdAt,
+            }),
+          }),
+      ),
+    });
   }
 }

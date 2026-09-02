@@ -19,13 +19,14 @@ export class DeletarReservaUseCase implements DeletarReservaUseCaseContract {
     const sucesso = await this.reservaRepository.delete(id);
 
     if (sucesso && reserva.status !== 'CANCELADA') {
-      const voo = await this.vooRepository.findById(reserva.vooId);
-      if (voo) {
-        await this.vooRepository.update(voo.id, {
-          assentosDisponiveis:
-            voo.assentosDisponiveis + reserva.numeroPassageiros,
-        });
-      }
+      await Promise.all(
+        reserva.trechos.map((trecho) =>
+          this.vooRepository.update(trecho.voo.id, {
+            assentosDisponiveis:
+              trecho.voo.assentosDisponiveis + reserva.numeroPassageiros,
+          }),
+        ),
+      );
     }
 
     return sucesso;

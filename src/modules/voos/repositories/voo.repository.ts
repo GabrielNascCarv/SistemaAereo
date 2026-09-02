@@ -92,8 +92,8 @@ export class VooRepository implements VooRepositoryContract {
   }
 
   async possuiReservaAtiva(vooId: number): Promise<boolean> {
-    const total = await this.prisma.reserva.count({
-      where: { vooId, status: { not: 'CANCELADA' } },
+    const total = await this.prisma.reservaTrecho.count({
+      where: { vooId, reserva: { status: { not: 'CANCELADA' } } },
     });
 
     return total > 0;

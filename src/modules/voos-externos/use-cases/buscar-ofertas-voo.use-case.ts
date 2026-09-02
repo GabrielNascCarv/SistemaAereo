@@ -13,7 +13,8 @@ export class BuscarOfertasVooUseCase {
   async execute(params: {
     origem: string;
     destino: string;
-    data: string;
+    dataIda: string;
+    dataVolta?: string;
   }): Promise<OfertaVooDto[]> {
     return this.gateway.buscarOfertas(params);
   }

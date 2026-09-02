@@ -2,6 +2,15 @@ import { Injectable } from '@nestjs/common';
 import { PrismaService } from '../../../core/database/prisma.service';
 import { ReservaRepositoryContract } from '../contracts/reserva-repository.contract';
 import { ReservaEntity } from '../entities/reserva.entity';
+import { TrechoReservaEntity } from '../entities/trecho-reserva.entity';
+import { VooEntity } from '../../voos/entities/voo.entity';
+
+const INCLUDE_TRECHOS = {
+  trechos: {
+    include: { voo: true },
+    orderBy: [{ direcao: 'asc' as const }, { ordem: 'asc' as const }],
+  },
+};
 
 @Injectable()
 export class ReservaRepository implements ReservaRepositoryContract {
@@ -10,15 +19,27 @@ export class ReservaRepository implements ReservaRepositoryContract {
   async create(data: {
     codigoReserva: string;
     numeroPassageiros: number;
-    vooId: number;
     passageiroId: number;
     status?: string;
+    trechos: Array<{ vooId: number; direcao: 'IDA' | 'VOLTA'; ordem: number }>;
   }): Promise<ReservaEntity> {
+    const { trechos, ...dadosReserva } = data;
+
     const reserva = await this.prisma.reserva.create({
-      data,
+      data: {
+        ...dadosReserva,
+        trechos: {
+          create: trechos.map((trecho) => ({
+            vooId: trecho.vooId,
+            direcao: trecho.direcao,
+            ordem: trecho.ordem,
+          })),
+        },
+      },
+      include: INCLUDE_TRECHOS,
     });
 
-    return ReservaEntity.create(reserva);
+    return this.paraEntidade(reserva);
   }
 
   async findByCodigoReserva(
@@ -26,17 +47,19 @@ export class ReservaRepository implements ReservaRepositoryContract {
   ): Promise<ReservaEntity | null> {
     const reserva = await this.prisma.reserva.findUnique({
       where: { codigoReserva },
+      include: INCLUDE_TRECHOS,
     });
 
-    return reserva ? ReservaEntity.create(reserva) : null;
+    return reserva ? this.paraEntidade(reserva) : null;
   }
 
   async findById(id: number): Promise<ReservaEntity | null> {
     const reserva = await this.prisma.reserva.findUnique({
       where: { id },
+      include: INCLUDE_TRECHOS,
     });
 
-    return reserva ? ReservaEntity.create(reserva) : null;
+    return reserva ? this.paraEntidade(reserva) : null;
   }
 
   async findAll(params: { skip: number; take: number }): Promise<{
@@ -48,12 +71,13 @@ export class ReservaRepository implements ReservaRepositoryContract {
         skip: params.skip,
         take: params.take,
         orderBy: { createdAt: 'desc' },
+        include: INCLUDE_TRECHOS,
       }),
       this.prisma.reserva.count(),
     ]);
 
     return {
-      data: reservas.map((reserva) => ReservaEntity.create(reserva)),
+      data: reservas.map((reserva) => this.paraEntidade(reserva)),
       total,
     };
   }
@@ -68,9 +92,10 @@ export class ReservaRepository implements ReservaRepositoryContract {
     const reserva = await this.prisma.reserva.update({
       where: { id },
       data,
+      include: INCLUDE_TRECHOS,
     });
 
-    return ReservaEntity.create(reserva);
+    return this.paraEntidade(reserva);
   }
 
   async delete(id: number): Promise<boolean> {
@@ -82,5 +107,36 @@ export class ReservaRepository implements ReservaRepositoryContract {
     } catch {
       return false;
     }
+  }
+
+  private paraEntidade(reserva: {
+    id: number;
+    codigoReserva: string;
+    dataReserva: Date;
+    status: string;
+    numeroPassageiros: number;
+    passageiroId: number;
+    createdAt: Date;
+    updatedAt: Date;
+    trechos: Array<{
+      id: number;
+      vooId: number;
+      direcao: string;
+      ordem: number;
+      voo: Parameters<typeof VooEntity.create>[0];
+    }>;
+  }): ReservaEntity {
+    return ReservaEntity.create({
+      ...reserva,
+      trechos: reserva.trechos.map((trecho) =>
+        TrechoReservaEntity.create({
+          id: trecho.id,
+          vooId: trecho.vooId,
+          direcao: trecho.direcao as 'IDA' | 'VOLTA',
+          ordem: trecho.ordem,
+          voo: VooEntity.create(trecho.voo),
+        }),
+      ),
+    });
   }
 }

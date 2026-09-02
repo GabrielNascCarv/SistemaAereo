@@ -32,30 +32,39 @@ export class AtualizarReservaUseCase
       throw new BadRequestException('Reserva cancelada não pode ser alterada');
     }
 
-    const voo = await this.vooRepository.findById(reservaExistente.vooId);
-    if (!voo) {
-      throw new NotFoundException('Voo não encontrado');
-    }
-
     if (data.status === 'CANCELADA') {
-      await this.vooRepository.update(voo.id, {
-        assentosDisponiveis:
-          voo.assentosDisponiveis + reservaExistente.numeroPassageiros,
-      });
+      await Promise.all(
+        reservaExistente.trechos.map((trecho) =>
+          this.vooRepository.update(trecho.voo.id, {
+            assentosDisponiveis:
+              trecho.voo.assentosDisponiveis +
+              reservaExistente.numeroPassageiros,
+          }),
+        ),
+      );
     } else if (
       data.numeroPassageiros !== undefined &&
       data.numeroPassageiros !== reservaExistente.numeroPassageiros
     ) {
       const diferenca =
         data.numeroPassageiros - reservaExistente.numeroPassageiros;
-      if (diferenca > voo.assentosDisponiveis) {
+
+      const semAssentosSuficientes = reservaExistente.trechos.some(
+        (trecho) => diferenca > trecho.voo.assentosDisponiveis,
+      );
+      if (semAssentosSuficientes) {
         throw new BadRequestException(
           'Assentos disponíveis insuficientes para este voo',
         );
       }
-      await this.vooRepository.update(voo.id, {
-        assentosDisponiveis: voo.assentosDisponiveis - diferenca,
-      });
+
+      await Promise.all(
+        reservaExistente.trechos.map((trecho) =>
+          this.vooRepository.update(trecho.voo.id, {
+            assentosDisponiveis: trecho.voo.assentosDisponiveis - diferenca,
+          }),
+        ),
+      );
     }
 
     const reserva = await this.reservaRepository.update(id, data);
