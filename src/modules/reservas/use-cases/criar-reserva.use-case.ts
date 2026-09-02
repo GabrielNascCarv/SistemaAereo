@@ -22,6 +22,10 @@ export class CriarReservaUseCase implements CriarReservaUseCaseContract {
       throw new NotFoundException('Voo não encontrado');
     }
 
+    if (voo.status === 'CANCELADO' || voo.status === 'CONCLUIDO') {
+      throw new BadRequestException('Não é possível reservar em um voo cancelado ou concluído');
+    }
+
     const passageiro = await this.passageiroRepository.findById(data.passageiroId);
     if (!passageiro) {
       throw new NotFoundException('Passageiro não encontrado');
