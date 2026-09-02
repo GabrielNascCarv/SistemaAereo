@@ -40,6 +40,7 @@ describe('ImportarVooExternoUseCase', () => {
     gateway = {
       buscarOfertas: jest.fn(),
       buscarOfertaPorId: jest.fn(),
+      buscarSugestoesLugar: jest.fn(),
     };
 
     vooRepository = {

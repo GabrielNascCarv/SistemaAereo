@@ -10,6 +10,7 @@ describe('BuscarOfertasVooUseCase', () => {
     gateway = {
       buscarOfertas: jest.fn(),
       buscarOfertaPorId: jest.fn(),
+      buscarSugestoesLugar: jest.fn(),
     };
 
     useCase = new BuscarOfertasVooUseCase(gateway);

@@ -6,6 +6,7 @@ import {
 import { ConfigService } from '@nestjs/config';
 import { BuscaVoosGatewayContract } from '../contracts/busca-voos-gateway.contract';
 import { OfertaVooDto } from '../dto/oferta-voo.dto';
+import { SugestaoLugarDto } from '../dto/sugestao-lugar.dto';
 
 interface DuffelSegmento {
   marketing_carrier: { name: string; iata_code: string };
@@ -21,6 +22,13 @@ interface DuffelOferta {
   total_amount: string;
   total_currency: string;
   slices: Array<{ segments: DuffelSegmento[] }>;
+}
+
+interface DuffelLugar {
+  type: 'airport' | 'city';
+  name: string;
+  iata_code: string;
+  city_name: string | null;
 }
 
 /**
@@ -100,6 +108,22 @@ export class DuffelGateway implements BuscaVoosGatewayContract {
     );
 
     return resposta.data.offers.map((oferta) => this.paraOfertaVooDto(oferta));
+  }
+
+  async buscarSugestoesLugar(query: string): Promise<SugestaoLugarDto[]> {
+    const resposta = await this.chamarApi<{ data: DuffelLugar[] }>(
+      `/places/suggestions?query=${encodeURIComponent(query)}`,
+    );
+
+    return resposta.data.map(
+      (lugar) =>
+        new SugestaoLugarDto({
+          iataCode: lugar.iata_code,
+          nome: lugar.name,
+          cidade: lugar.city_name,
+          tipo: lugar.type,
+        }),
+    );
   }
 
   async buscarOfertaPorId(ofertaId: string): Promise<OfertaVooDto | null> {

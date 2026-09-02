@@ -4,6 +4,7 @@ import { VoosExternosController } from './controllers/voos-externos.controller';
 import { DuffelGateway } from './gateways/duffel.gateway';
 import { BuscarOfertasVooUseCase } from './use-cases/buscar-ofertas-voo.use-case';
 import { ImportarVooExternoUseCase } from './use-cases/importar-voo-externo.use-case';
+import { BuscarSugestoesLugarUseCase } from './use-cases/buscar-sugestoes-lugar.use-case';
 import { BUSCA_VOOS_GATEWAY } from './voos-externos.tokens';
 
 @Module({
@@ -13,6 +14,7 @@ import { BUSCA_VOOS_GATEWAY } from './voos-externos.tokens';
     { provide: BUSCA_VOOS_GATEWAY, useClass: DuffelGateway },
     BuscarOfertasVooUseCase,
     ImportarVooExternoUseCase,
+    BuscarSugestoesLugarUseCase,
   ],
 })
 export class VoosExternosModule {}
