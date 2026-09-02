@@ -4,6 +4,7 @@ import { CriarReservaUseCaseFactory } from '../use-cases/factory/criar-reserva.u
 import { ListarReservasUseCaseFactory } from '../use-cases/factory/listar-reservas.use-case.factory';
 import { ListarReservaPorIdUseCaseFactory } from '../use-cases/factory/listar-reserva-por-id.use-case.factory';
 import { AtualizarReservaUseCaseFactory } from '../use-cases/factory/atualizar-reserva.use-case.factory';
+import { DeletarReservaUseCaseFactory } from '../use-cases/factory/deletar-reserva.use-case.factory';
 
 @Injectable()
 export class ReservaControllerFactory {
@@ -12,6 +13,7 @@ export class ReservaControllerFactory {
     private readonly listarReservasUseCaseFactory: ListarReservasUseCaseFactory,
     private readonly listarReservaPorIdUseCaseFactory: ListarReservaPorIdUseCaseFactory,
     private readonly atualizarReservaUseCaseFactory: AtualizarReservaUseCaseFactory,
+    private readonly deletarReservaUseCaseFactory: DeletarReservaUseCaseFactory,
   ) {}
 
   create(): ReservaController {
@@ -19,6 +21,7 @@ export class ReservaControllerFactory {
     const listarReservasUseCase = this.listarReservasUseCaseFactory.create();
     const listarReservaPorIdUseCase = this.listarReservaPorIdUseCaseFactory.create();
     const atualizarReservaUseCase = this.atualizarReservaUseCaseFactory.create();
-    return new ReservaController(criarReservaUseCase, listarReservasUseCase, listarReservaPorIdUseCase, atualizarReservaUseCase);
+    const deletarReservaUseCase = this.deletarReservaUseCaseFactory.create();
+    return new ReservaController(criarReservaUseCase, listarReservasUseCase, listarReservaPorIdUseCase, atualizarReservaUseCase, deletarReservaUseCase);
   }
 }

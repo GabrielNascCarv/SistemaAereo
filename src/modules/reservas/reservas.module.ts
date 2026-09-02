@@ -11,6 +11,8 @@ import { ListarReservaPorIdUseCase } from './use-cases/listar-reserva-por-id.use
 import { ListarReservaPorIdUseCaseFactory } from './use-cases/factory/listar-reserva-por-id.use-case.factory';
 import { AtualizarReservaUseCase } from './use-cases/atualizar-reserva.use-case';
 import { AtualizarReservaUseCaseFactory } from './use-cases/factory/atualizar-reserva.use-case.factory';
+import { DeletarReservaUseCase } from './use-cases/deletar-reserva.use-case';
+import { DeletarReservaUseCaseFactory } from './use-cases/factory/deletar-reserva.use-case.factory';
 import { ReservaControllerFactory } from './controllers/reserva.controller.factory';
 
 @Module({
@@ -26,6 +28,8 @@ import { ReservaControllerFactory } from './controllers/reserva.controller.facto
     ListarReservaPorIdUseCaseFactory,
     AtualizarReservaUseCase,
     AtualizarReservaUseCaseFactory,
+    DeletarReservaUseCase,
+    DeletarReservaUseCaseFactory,
     ReservaControllerFactory,
   ],
   exports: [ReservaRepository],
