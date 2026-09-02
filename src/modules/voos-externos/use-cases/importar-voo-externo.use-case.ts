@@ -11,6 +11,11 @@ export interface TrechoImportado {
   voo: VooEntity;
 }
 
+// A Duffel não informa a lotação real do avião nessa oferta — usamos um
+// valor fixo razoável para permitir reservas em grupo sem esbarrar em
+// "assentos insuficientes" para buscas simples de teste.
+const ASSENTOS_DISPONIVEIS_PADRAO = 15;
+
 @Injectable()
 export class ImportarVooExternoUseCase {
   constructor(
@@ -25,10 +30,9 @@ export class ImportarVooExternoUseCase {
       throw new NotFoundException('Oferta de voo não encontrada');
     }
 
-    // MVP: uma oferta da Duffel representa 1 assento reservável nessa busca
-    // específica, não a lotação real do avião. A Duffel não expõe preço por
-    // trecho — dividimos o valor total do itinerário entre os voos
-    // importados como aproximação (fica exato para itinerários diretos).
+    // A Duffel não expõe preço por trecho — dividimos o valor total do
+    // itinerário entre os voos importados como aproximação (fica exato
+    // para itinerários diretos).
     const totalTrechos = oferta.slices.reduce(
       (total, slice) => total + slice.segmentos.length,
       0,
@@ -57,7 +61,7 @@ export class ImportarVooExternoUseCase {
             destino: segmento.destino,
             dataPartida,
             dataChegada: new Date(segmento.dataChegada),
-            assentosDisponiveis: 1,
+            assentosDisponiveis: ASSENTOS_DISPONIVEIS_PADRAO,
             preco: precoPorTrecho,
           }));
 

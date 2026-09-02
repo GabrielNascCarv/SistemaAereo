@@ -45,7 +45,7 @@ describe('ImportarVooExternoUseCase', () => {
       destino: 'GIG',
       dataPartida: new Date('2026-12-01T10:00:00.000Z'),
       dataChegada: new Date('2026-12-01T11:00:00.000Z'),
-      assentosDisponiveis: 1,
+      assentosDisponiveis: 15,
       preco: 500,
       status: 'AGENDADO',
       createdAt: new Date(),
@@ -96,7 +96,7 @@ describe('ImportarVooExternoUseCase', () => {
       destino: 'GIG',
       dataPartida: new Date('2026-12-01T10:00:00.000Z'),
       dataChegada: new Date('2026-12-01T11:00:00.000Z'),
-      assentosDisponiveis: 1,
+      assentosDisponiveis: 15,
       preco: 500,
     });
     expect(resultado).toEqual([{ vooId: 1, direcao: 'IDA', ordem: 1, voo }]);
