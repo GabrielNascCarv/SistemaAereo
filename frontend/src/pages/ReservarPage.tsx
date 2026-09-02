@@ -7,6 +7,7 @@ import { criarReserva } from '../api/reservas';
 import { ApiError } from '../api/client';
 import { Campo } from '../components/Campo';
 import { Botao } from '../components/Botao';
+import { mascararCpf, mascararTelefone } from '../utils/mascaras';
 
 export function ReservarPage() {
   const navigate = useNavigate();
@@ -100,14 +101,18 @@ export function ReservarPage() {
             label="CPF"
             placeholder="000.000.000-00"
             required
+            inputMode="numeric"
+            maxLength={14}
             value={cpf}
-            onChange={(e) => setCpf(e.target.value)}
+            onChange={(e) => setCpf(mascararCpf(e.target.value))}
           />
           <Campo
             label="Telefone (opcional)"
             placeholder="(00) 00000-0000"
+            inputMode="numeric"
+            maxLength={15}
             value={telefone}
-            onChange={(e) => setTelefone(e.target.value)}
+            onChange={(e) => setTelefone(mascararTelefone(e.target.value))}
           />
         </div>
         <Campo
