@@ -11,7 +11,10 @@ export interface PassageiroRepositoryContract {
   findByEmail(email: string): Promise<PassageiroEntity | null>;
   findByCpf(cpf: string): Promise<PassageiroEntity | null>;
   findById(id: number): Promise<PassageiroEntity | null>;
-  findAll(): Promise<PassageiroEntity[]>;
+  findAll(params: { skip: number; take: number }): Promise<{
+    data: PassageiroEntity[];
+    total: number;
+  }>;
   update(id: number, data: {
     nome?: string;
     email?: string;

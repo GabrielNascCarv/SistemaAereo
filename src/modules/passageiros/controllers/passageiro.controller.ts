@@ -1,4 +1,4 @@
-import { Controller, Post, Body, HttpCode, HttpStatus, Get, Param, ParseIntPipe, NotFoundException, Put, Delete } from '@nestjs/common';
+import { Controller, Post, Body, HttpCode, HttpStatus, Get, Param, ParseIntPipe, NotFoundException, Put, Delete, Query } from '@nestjs/common';
 import { CriarPassageiroUseCase } from '../use-cases/criar-passageiro.use-case';
 import { ListarPassageirosUseCase } from '../use-cases/listar-passageiros.use-case';
 import { ListarPassageiroPorIdUseCase } from '../use-cases/listar-passageiro-por-id.use-case';
@@ -7,6 +7,8 @@ import { CriarPassageiroDto } from '../dto/criar-passageiro.dto';
 import { AtualizarPassageiroDto } from '../dto/atualizar-passageiro.dto';
 import { PassageiroResponseDto } from '../dto/passageiro-response.dto';
 import { DeletarPassageiroUseCase } from '../use-cases/deletar-passageiro.use-case';
+import { PaginacaoQueryDto } from '../../../core/common/dto/paginacao-query.dto';
+import { PaginaResultadoDto } from '../../../core/common/dto/pagina-resultado.dto';
 
 @Controller('passageiros')
 export class PassageiroController {
@@ -34,10 +36,11 @@ export class PassageiroController {
   }
 
   @Get()
-  async listar(): Promise<PassageiroResponseDto[]> {
-    const passageiros = await this.listarPassageirosUseCase.execute();
-    
-    return passageiros.map(passageiro => new PassageiroResponseDto({
+  async listar(@Query() query: PaginacaoQueryDto): Promise<PaginaResultadoDto<PassageiroResponseDto>> {
+    const { page = 1, limit = 15 } = query;
+    const { data, total } = await this.listarPassageirosUseCase.execute({ page, limit });
+
+    const passageiros = data.map(passageiro => new PassageiroResponseDto({
       id: passageiro.id,
       nome: passageiro.nome,
       email: passageiro.email,
@@ -45,6 +48,8 @@ export class PassageiroController {
       telefone: passageiro.telefone,
       createdAt: passageiro.createdAt,
     }));
+
+    return new PaginaResultadoDto(passageiros, total, page, limit);
   }
 
   @Get(':id')

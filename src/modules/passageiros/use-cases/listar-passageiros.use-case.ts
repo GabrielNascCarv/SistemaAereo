@@ -6,7 +6,8 @@ import { PassageiroRepository } from '../repositories/passageiro.repository';
 export class ListarPassageirosUseCase implements ListarPassageirosUseCaseContract {
     constructor(private readonly passageiroRepository: PassageiroRepository) {}
 
-    async execute() {
-        return await this.passageiroRepository.findAll();
+    async execute(params: { page: number; limit: number }) {
+        const skip = (params.page - 1) * params.limit;
+        return await this.passageiroRepository.findAll({ skip, take: params.limit });
     }
 }

@@ -21,7 +21,7 @@ import { ReservasModule } from './modules/reservas/reservas.module';
   providers: [
     {
       provide: APP_PIPE,
-      useClass: ValidationPipe,
+      useValue: new ValidationPipe({ transform: true }),
     },
   ],
 })
