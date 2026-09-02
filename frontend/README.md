@@ -1,32 +1,35 @@
-# React + TypeScript + Vite
+# Sistema Aéreo — Frontend
 
-This template provides a minimal setup to get React working in Vite with HMR and some Oxlint rules.
+SPA em React que consome a [API do Sistema Aéreo](../README.md). Não é um projeto de e-commerce real: é a demonstração visual do backend, terminando de propósito numa tela de "gateway de pagamento fora de escopo".
 
-Currently, two official plugins are available:
+## Stack
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Oxc](https://oxc.rs)
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/)
+Vite + React 19 + TypeScript + Tailwind v4 + React Router.
 
-## React Compiler
+## Fluxo
 
-The React Compiler is not enabled on this template because of its impact on dev & build performances. To add it, see [this documentation](https://react.dev/learn/react-compiler/installation).
-
-## Expanding the Oxlint configuration
-
-If you are developing a production application, we recommend enabling type-aware lint rules by installing `oxlint-tsgolint` and editing `.oxlintrc.json`:
-
-```json
-{
-  "$schema": "./node_modules/oxlint/configuration_schema.json",
-  "plugins": ["react", "typescript", "oxc"],
-  "options": {
-    "typeAware": true
-  },
-  "rules": {
-    "react/rules-of-hooks": "error",
-    "react/only-export-components": ["warn", { "allowConstantExport": true }]
-  }
-}
+```
+Busca (Duffel ao vivo) → Resultados → Dados do passageiro
+  → Reserva criada (PENDENTE_PAGAMENTO) → Efetuar pagamento → fim do projeto
 ```
 
-See the [Oxlint rules documentation](https://oxc.rs/docs/guide/usage/linter/rules) for the full list of rules and categories.
+- A busca de voos filtra no cliente para mostrar só ofertas diretas (o backend não modela itinerários com conexão).
+- Selecionar uma oferta importa o voo pra dentro do banco do backend (`POST /voos-externos/importar`) e, na sequência, cria o passageiro e a reserva de verdade.
+- Não existe gateway de pagamento: a última tela explica isso ao usuário em vez de fingir uma cobrança.
+
+## Rodando localmente
+
+Precisa do [backend](../README.md) rodando em paralelo (`npm run start:dev` na raiz do repo).
+
+```bash
+npm install
+cp .env.example .env   # ajuste VITE_API_URL se a API não estiver em localhost:3000
+npm run dev
+```
+
+## Build
+
+```bash
+npm run build
+npm run preview
+```
