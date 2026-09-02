@@ -7,6 +7,8 @@ import { CriarReservaUseCase } from './use-cases/criar-reserva.use-case';
 import { CriarReservaUseCaseFactory } from './use-cases/factory/criar-reserva.use-case.factory';
 import { ListarReservasUseCase } from './use-cases/listar-reservas.use-case';
 import { ListarReservasUseCaseFactory } from './use-cases/factory/listar-reservas.use-case.factory';
+import { ListarReservaPorIdUseCase } from './use-cases/listar-reserva-por-id.use-case';
+import { ListarReservaPorIdUseCaseFactory } from './use-cases/factory/listar-reserva-por-id.use-case.factory';
 import { ReservaControllerFactory } from './controllers/reserva.controller.factory';
 
 @Module({
@@ -18,6 +20,8 @@ import { ReservaControllerFactory } from './controllers/reserva.controller.facto
     CriarReservaUseCaseFactory,
     ListarReservasUseCase,
     ListarReservasUseCaseFactory,
+    ListarReservaPorIdUseCase,
+    ListarReservaPorIdUseCaseFactory,
     ReservaControllerFactory,
   ],
   exports: [ReservaRepository],
