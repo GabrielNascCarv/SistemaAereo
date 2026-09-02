@@ -37,12 +37,23 @@ export class ReservaRepository implements ReservaRepositoryContract {
     return reserva ? ReservaEntity.create(reserva) : null;
   }
 
-  async findAll(): Promise<ReservaEntity[]> {
-    const reservas = await this.prisma.reserva.findMany({
-      orderBy: { createdAt: 'desc' },
-    });
+  async findAll(params: { skip: number; take: number }): Promise<{
+    data: ReservaEntity[];
+    total: number;
+  }> {
+    const [reservas, total] = await Promise.all([
+      this.prisma.reserva.findMany({
+        skip: params.skip,
+        take: params.take,
+        orderBy: { createdAt: 'desc' },
+      }),
+      this.prisma.reserva.count(),
+    ]);
 
-    return reservas.map(reserva => ReservaEntity.create(reserva));
+    return {
+      data: reservas.map(reserva => ReservaEntity.create(reserva)),
+      total,
+    };
   }
 
   async update(id: number, data: {

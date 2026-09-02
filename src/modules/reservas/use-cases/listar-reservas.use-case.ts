@@ -6,7 +6,8 @@ import { ReservaRepository } from '../repositories/reserva.repository';
 export class ListarReservasUseCase implements ListarReservasUseCaseContract {
   constructor(private readonly reservaRepository: ReservaRepository) {}
 
-  async execute() {
-    return await this.reservaRepository.findAll();
+  async execute(params: { page: number; limit: number }) {
+    const skip = (params.page - 1) * params.limit;
+    return await this.reservaRepository.findAll({ skip, take: params.limit });
   }
 }

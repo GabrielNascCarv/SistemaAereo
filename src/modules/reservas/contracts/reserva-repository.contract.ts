@@ -11,7 +11,10 @@ export interface ReservaRepositoryContract {
 
   findByCodigoReserva(codigoReserva: string): Promise<ReservaEntity | null>;
   findById(id: number): Promise<ReservaEntity | null>;
-  findAll(): Promise<ReservaEntity[]>;
+  findAll(params: { skip: number; take: number }): Promise<{
+    data: ReservaEntity[];
+    total: number;
+  }>;
   update(id: number, data: {
     status?: string;
     numeroPassageiros?: number;

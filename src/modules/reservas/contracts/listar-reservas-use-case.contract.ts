@@ -1,5 +1,8 @@
 import { ReservaEntity } from '../entities/reserva.entity';
 
 export interface ListarReservasUseCaseContract {
-  execute(): Promise<ReservaEntity[]>;
+  execute(params: { page: number; limit: number }): Promise<{
+    data: ReservaEntity[];
+    total: number;
+  }>;
 }
