@@ -2,6 +2,7 @@ import {
   Injectable,
   NotFoundException,
   ConflictException,
+  BadRequestException,
 } from '@nestjs/common';
 import type { AtualizarVooUseCaseContract } from '../contracts/atualizar-voo-use-case.contract';
 import { VooRepository } from '../repositories/voo.repository';
@@ -34,6 +35,18 @@ export class AtualizarVooUseCase implements AtualizarVooUseCaseContract {
       );
       if (vooComNumero) {
         throw new ConflictException('Número do voo já cadastrado');
+      }
+    }
+
+    const alterandoDatas =
+      data.dataPartida !== undefined || data.dataChegada !== undefined;
+    if (alterandoDatas) {
+      const possuiReservaConfirmada =
+        await this.vooRepository.possuiReservaConfirmada(id);
+      if (possuiReservaConfirmada) {
+        throw new BadRequestException(
+          'Não é possível alterar as datas de um voo com reservas confirmadas',
+        );
       }
     }
 

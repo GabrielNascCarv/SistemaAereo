@@ -200,4 +200,55 @@ describe('Reservas (e2e)', () => {
     expect(pagina.total).toBe(3);
     expect(pagina.totalPages).toBe(2);
   });
+
+  it('deve impedir alterar as datas de um voo com reserva confirmada', async () => {
+    const passageiroId = await criarPassageiro();
+    const vooId = await criarVoo();
+
+    await request(app.getHttpServer())
+      .post('/api/reservas')
+      .send({ vooId, passageiroId, numeroPassageiros: 1 })
+      .expect(201);
+
+    await request(app.getHttpServer())
+      .put(`/api/voos/${vooId}`)
+      .send({ dataPartida: '2026-12-01T10:00:00.000Z' })
+      .expect(400);
+  });
+
+  it('deve permitir alterar outros campos do voo mesmo com reserva confirmada', async () => {
+    const passageiroId = await criarPassageiro();
+    const vooId = await criarVoo();
+
+    await request(app.getHttpServer())
+      .post('/api/reservas')
+      .send({ vooId, passageiroId, numeroPassageiros: 1 })
+      .expect(201);
+
+    await request(app.getHttpServer())
+      .put(`/api/voos/${vooId}`)
+      .send({ preco: 699.9 })
+      .expect(200);
+  });
+
+  it('deve permitir alterar as datas do voo após a reserva ser cancelada', async () => {
+    const passageiroId = await criarPassageiro();
+    const vooId = await criarVoo();
+
+    const criada = await request(app.getHttpServer())
+      .post('/api/reservas')
+      .send({ vooId, passageiroId, numeroPassageiros: 1 })
+      .expect(201);
+    const { id } = corpoComo<ReservaResponseDto>(criada);
+
+    await request(app.getHttpServer())
+      .put(`/api/reservas/${id}`)
+      .send({ status: 'CANCELADA' })
+      .expect(200);
+
+    await request(app.getHttpServer())
+      .put(`/api/voos/${vooId}`)
+      .send({ dataPartida: '2026-12-01T10:00:00.000Z' })
+      .expect(200);
+  });
 });

@@ -90,4 +90,12 @@ export class VooRepository implements VooRepositoryContract {
       return false;
     }
   }
+
+  async possuiReservaConfirmada(vooId: number): Promise<boolean> {
+    const total = await this.prisma.reserva.count({
+      where: { vooId, status: 'CONFIRMADA' },
+    });
+
+    return total > 0;
+  }
 }

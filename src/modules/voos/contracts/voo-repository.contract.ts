@@ -32,4 +32,5 @@ export interface VooRepositoryContract {
     },
   ): Promise<VooEntity>;
   delete(id: number): Promise<boolean>;
+  possuiReservaConfirmada(vooId: number): Promise<boolean>;
 }

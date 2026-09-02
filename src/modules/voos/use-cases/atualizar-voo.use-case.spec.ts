@@ -1,4 +1,8 @@
-import { ConflictException, NotFoundException } from '@nestjs/common';
+import {
+  BadRequestException,
+  ConflictException,
+  NotFoundException,
+} from '@nestjs/common';
 import { AtualizarVooUseCase } from './atualizar-voo.use-case';
 import { VooRepository } from '../repositories/voo.repository';
 import { VooEntity } from '../entities/voo.entity';
@@ -29,7 +33,10 @@ describe('AtualizarVooUseCase', () => {
       findAll: jest.fn(),
       update: jest.fn(),
       delete: jest.fn(),
+      possuiReservaConfirmada: jest.fn(),
     } as unknown as jest.Mocked<VooRepository>;
+
+    vooRepository.possuiReservaConfirmada.mockResolvedValue(false);
 
     useCase = new AtualizarVooUseCase(vooRepository);
   });
@@ -63,5 +70,41 @@ describe('AtualizarVooUseCase', () => {
       ConflictException,
     );
     expect(vooRepository.update).not.toHaveBeenCalled();
+  });
+
+  it('não deve checar reservas confirmadas quando as datas não mudam', async () => {
+    vooRepository.findById.mockResolvedValue(vooExistente);
+    vooRepository.update.mockResolvedValue(vooExistente);
+
+    await useCase.execute(1, { preco: 599.9 });
+
+    expect(vooRepository.possuiReservaConfirmada).not.toHaveBeenCalled();
+  });
+
+  it.each([
+    ['dataPartida', { dataPartida: new Date('2026-11-01T10:00:00.000Z') }],
+    ['dataChegada', { dataChegada: new Date('2026-11-01T11:00:00.000Z') }],
+  ])(
+    'deve lançar BadRequestException ao alterar %s de um voo com reserva confirmada',
+    async (_campo, alteracao) => {
+      vooRepository.findById.mockResolvedValue(vooExistente);
+      vooRepository.possuiReservaConfirmada.mockResolvedValue(true);
+
+      await expect(useCase.execute(1, alteracao)).rejects.toThrow(
+        BadRequestException,
+      );
+      expect(vooRepository.update).not.toHaveBeenCalled();
+    },
+  );
+
+  it('deve permitir alterar as datas quando não há reserva confirmada', async () => {
+    vooRepository.findById.mockResolvedValue(vooExistente);
+    vooRepository.possuiReservaConfirmada.mockResolvedValue(false);
+    vooRepository.update.mockResolvedValue(vooExistente);
+
+    const novaData = { dataPartida: new Date('2026-11-01T10:00:00.000Z') };
+    await useCase.execute(1, novaData);
+
+    expect(vooRepository.update).toHaveBeenCalledWith(1, novaData);
   });
 });
