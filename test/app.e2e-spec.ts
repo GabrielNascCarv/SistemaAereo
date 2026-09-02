@@ -1,25 +1,32 @@
-import { Test, TestingModule } from '@nestjs/testing';
 import { INestApplication } from '@nestjs/common';
 import request from 'supertest';
 import { App } from 'supertest/types';
-import { AppModule } from './../src/app.module';
+import { criarAppTeste } from './utils/criar-app-teste.util';
+import { limparBanco, prismaTeste } from './utils/prisma-test.util';
 
-describe('AppController (e2e)', () => {
+describe('AppModule (e2e)', () => {
   let app: INestApplication<App>;
 
-  beforeEach(async () => {
-    const moduleFixture: TestingModule = await Test.createTestingModule({
-      imports: [AppModule],
-    }).compile();
-
-    app = moduleFixture.createNestApplication();
-    await app.init();
+  beforeAll(async () => {
+    app = await criarAppTeste();
   });
 
-  it('/ (GET)', () => {
-    return request(app.getHttpServer())
-      .get('/')
-      .expect(200)
-      .expect('Hello World!');
+  afterAll(async () => {
+    await app.close();
+    await prismaTeste.$disconnect();
+  });
+
+  beforeEach(async () => {
+    await limparBanco();
+  });
+
+  it('deve responder 404 para uma rota inexistente', () => {
+    return request(app.getHttpServer()).get('/rota-que-nao-existe').expect(404);
+  });
+
+  it('deve expor as rotas de passageiros, voos e reservas sob /api', async () => {
+    await request(app.getHttpServer()).get('/api/passageiros').expect(200);
+    await request(app.getHttpServer()).get('/api/voos').expect(200);
+    await request(app.getHttpServer()).get('/api/reservas').expect(200);
   });
 });
