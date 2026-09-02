@@ -1,8 +1,10 @@
-import { Controller, Post, Body, HttpCode, HttpStatus, Get, Param, ParseIntPipe, NotFoundException } from '@nestjs/common';
+import { Controller, Post, Body, HttpCode, HttpStatus, Get, Param, ParseIntPipe, NotFoundException, Put } from '@nestjs/common';
 import { CriarVooUseCase } from '../use-cases/criar-voo.use-case';
 import { ListarVoosUseCase } from '../use-cases/listar-voos.use-case';
 import { ListarVooPorIdUseCase } from '../use-cases/listar-voo-por-id.use-case';
+import { AtualizarVooUseCase } from '../use-cases/atualizar-voo.use-case';
 import { CriarVooDto } from '../dto/criar-voo.dto';
+import { AtualizarVooDto } from '../dto/atualizar-voo.dto';
 import { VooResponseDto } from '../dto/voo-response.dto';
 
 @Controller('voos')
@@ -11,6 +13,7 @@ export class VooController {
     private readonly criarVooUseCase: CriarVooUseCase,
     private readonly listarVoosUseCase: ListarVoosUseCase,
     private readonly listarVooPorIdUseCase: ListarVooPorIdUseCase,
+    private readonly atualizarVooUseCase: AtualizarVooUseCase,
   ) {}
 
   @Post()
@@ -61,6 +64,31 @@ export class VooController {
     if (!voo) {
       throw new NotFoundException('Voo não encontrado');
     }
+
+    return new VooResponseDto({
+      id: voo.id,
+      numeroVoo: voo.numeroVoo,
+      origem: voo.origem,
+      destino: voo.destino,
+      dataPartida: voo.dataPartida,
+      dataChegada: voo.dataChegada,
+      assentosDisponiveis: voo.assentosDisponiveis,
+      preco: voo.preco,
+      status: voo.status,
+      createdAt: voo.createdAt,
+    });
+  }
+
+  @Put(':id')
+  async atualizar(
+    @Param('id', ParseIntPipe) id: number,
+    @Body() data: AtualizarVooDto,
+  ): Promise<VooResponseDto> {
+    const voo = await this.atualizarVooUseCase.execute(id, {
+      ...data,
+      dataPartida: data.dataPartida ? new Date(data.dataPartida) : undefined,
+      dataChegada: data.dataChegada ? new Date(data.dataChegada) : undefined,
+    });
 
     return new VooResponseDto({
       id: voo.id,
