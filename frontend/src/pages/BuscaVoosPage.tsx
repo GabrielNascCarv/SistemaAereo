@@ -1,5 +1,6 @@
 import { useState, type FormEvent } from 'react';
 import { useNavigate } from 'react-router-dom';
+import { CampoAutocompleteLugar } from '../components/CampoAutocompleteLugar';
 import { Campo } from '../components/Campo';
 import { Botao } from '../components/Botao';
 
@@ -14,8 +15,8 @@ export function BuscaVoosPage() {
     evento.preventDefault();
     setErro(null);
 
-    if (origem.trim().length !== 3 || destino.trim().length !== 3) {
-      setErro('Origem e destino devem ser códigos IATA de 3 letras (ex: GRU, JFK, LHR)');
+    if (!origem || !destino) {
+      setErro('Selecione uma cidade ou aeroporto de origem e destino na lista sugerida');
       return;
     }
     if (!data) {
@@ -23,11 +24,7 @@ export function BuscaVoosPage() {
       return;
     }
 
-    const query = new URLSearchParams({
-      origem: origem.trim().toUpperCase(),
-      destino: destino.trim().toUpperCase(),
-      data,
-    });
+    const query = new URLSearchParams({ origem, destino, data });
     navigate(`/resultados?${query.toString()}`);
   }
 
@@ -39,19 +36,15 @@ export function BuscaVoosPage() {
       </p>
 
       <form onSubmit={handleSubmit} className="mt-8 grid gap-4 sm:grid-cols-3">
-        <Campo
+        <CampoAutocompleteLugar
           label="Origem"
-          placeholder="GRU"
-          maxLength={3}
-          value={origem}
-          onChange={(e) => setOrigem(e.target.value.toUpperCase())}
+          placeholder="Digite uma cidade ou aeroporto"
+          onSelecionar={(lugar) => setOrigem(lugar.iataCode)}
         />
-        <Campo
+        <CampoAutocompleteLugar
           label="Destino"
-          placeholder="JFK"
-          maxLength={3}
-          value={destino}
-          onChange={(e) => setDestino(e.target.value.toUpperCase())}
+          placeholder="Digite uma cidade ou aeroporto"
+          onSelecionar={(lugar) => setDestino(lugar.iataCode)}
         />
         <Campo label="Data" type="date" value={data} onChange={(e) => setData(e.target.value)} />
 
@@ -65,8 +58,8 @@ export function BuscaVoosPage() {
       </form>
 
       <p className="mt-10 text-xs text-slate-400">
-        Dica: no ambiente de teste da Duffel, rotas conhecidas como LHR → JFK costumam ter bons
-        resultados.
+        Dica: no ambiente de teste da Duffel, rotas conhecidas como Londres → Nova York costumam
+        ter bons resultados.
       </p>
     </div>
   );

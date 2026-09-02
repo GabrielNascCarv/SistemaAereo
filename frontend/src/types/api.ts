@@ -10,6 +10,13 @@ export interface OfertaVoo {
   moeda: string;
 }
 
+export interface SugestaoLugar {
+  iataCode: string;
+  nome: string;
+  cidade: string | null;
+  tipo: 'airport' | 'city';
+}
+
 export interface Voo {
   id: number;
   numeroVoo: string;
