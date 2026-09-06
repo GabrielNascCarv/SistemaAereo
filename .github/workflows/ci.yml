@@ -51,6 +51,11 @@ jobs:
       - name: Testes unitários
         run: npm test
 
+      - name: Criar .env.test para o CI
+        run: |
+          echo "DATABASE_URL=$DATABASE_URL" >> .env.test
+          echo "DIRECT_URL=$DIRECT_URL" >> .env.test
+
       - name: Testes e2e
         run: npm run test:e2e
         
