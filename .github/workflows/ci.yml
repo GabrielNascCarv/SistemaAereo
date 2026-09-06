@@ -1,0 +1,55 @@
+name: CI
+
+on:
+  push:
+    branches:
+      - master
+  pull_request:
+    branches:
+      - master
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+
+    services:
+      postgres:
+        image: postgres:16
+        env:
+          POSTGRES_USER: postgres
+          POSTGRES_PASSWORD: postgres
+          POSTGRES_DB: sistema_aereo_test
+        ports:
+          - 5432:5432
+        options: >-
+          --health-cmd pg_isready
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
+
+    steps:
+      - name: Checkout do código
+        uses: actions/checkout@v4
+
+      - name: Instalar Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          cache: 'npm'
+
+      - name: Instalar dependências
+        run: npm ci
+
+      - name: Lint
+        run: npm run lint
+
+      - name: Testes unitários
+        run: npm test
+
+      - name: Testes e2e
+        run: npm run test:e2e
+        env:
+          DATABASE_URL: postgresql://postgres:postgres@localhost:5432/sistema_aereo_test?schema=public
+          DIRECT_URL: postgresql://postgres:postgres@localhost:5432/sistema_aereo_test?schema=public
+          DUFFEL_API_TOKEN: test_token_fake_para_ci
+          DUFFEL_BASE_URL: https://api.duffel.com

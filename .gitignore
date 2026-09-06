@@ -107,3 +107,6 @@ prisma/migrations/dev.db*
 *.db
 *.sqlite
 *.sqlite3
+
+# Notas de trabalho locais
+RECOMENDACOES_PORTFOLIO.md
