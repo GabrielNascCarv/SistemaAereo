@@ -11,6 +11,11 @@ on:
 jobs:
   test:
     runs-on: ubuntu-latest
+    env:
+      DATABASE_URL: postgresql://postgres:postgres@localhost:5432/sistema_aereo_test?schema=public
+      DIRECT_URL: postgresql://postgres:postgres@localhost:5432/sistema_aereo_test?schema=public
+      DUFFEL_API_TOKEN: test_token_fake_para_ci
+      DUFFEL_BASE_URL: https://api.duffel.com
 
     services:
       postgres:
@@ -48,8 +53,4 @@ jobs:
 
       - name: Testes e2e
         run: npm run test:e2e
-        env:
-          DATABASE_URL: postgresql://postgres:postgres@localhost:5432/sistema_aereo_test?schema=public
-          DIRECT_URL: postgresql://postgres:postgres@localhost:5432/sistema_aereo_test?schema=public
-          DUFFEL_API_TOKEN: test_token_fake_para_ci
-          DUFFEL_BASE_URL: https://api.duffel.com
+        
