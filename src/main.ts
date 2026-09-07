@@ -1,5 +1,6 @@
 import { NestFactory } from '@nestjs/core';
 import { AppModule } from './app.module';
+import { DocumentBuilder, SwaggerModule } from '@nestjs/swagger';
 
 async function bootstrap() {
   const app = await NestFactory.create(AppModule);
@@ -13,6 +14,15 @@ async function bootstrap() {
 
   // Configurar prefixo global da API
   app.setGlobalPrefix('api');
+
+  // Documentação interativa da API (Swagger/OpenAPI)
+  const config = new DocumentBuilder()
+    .setTitle('SistemaAereo API')
+    .setDescription('API de reservas aéreas — projeto de portfólio')
+    .setVersion('1.0')
+    .build();
+  const document = SwaggerModule.createDocument(app, config);
+  SwaggerModule.setup('docs', app, document);
 
   const porta = process.env.PORT ?? 3000;
   await app.listen(porta);
